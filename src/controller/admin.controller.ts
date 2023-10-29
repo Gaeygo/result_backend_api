@@ -1,10 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../lib/prisma";
-import { createAdminDetails } from "../model/schema";
+import { AdminCreateInput } from "../schema/adminSchema";
 
 
-const createAdmin = async (request: FastifyRequest<{
-    Body: createAdminDetails
+export const createAdmin = async (request: FastifyRequest<{
+    Body: AdminCreateInput
 }>, response: FastifyReply) => {
     const adminDetails = await prisma.admin.create({
         data: {
