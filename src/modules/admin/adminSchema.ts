@@ -7,9 +7,13 @@ const adminCreateSchema = z.object({
     password: z.string()
 })
 
+const adminSuspendSchema = z.object({
+    adminSuspendId: z.number()
+})
 
 export type AdminCreateInput = z.infer<typeof adminCreateSchema>
+export type AdminSuspendBody = z.infer<typeof adminSuspendSchema>
 
 export const { schemas: adminSchema, $ref } = buildJsonSchemas({
-    adminCreateSchema
+    adminCreateSchema, adminSuspendSchema
 }, { $id: 'Admin' })

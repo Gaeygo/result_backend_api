@@ -1,7 +1,7 @@
 import fastify from 'fastify'
 import { errorHandler } from './lib/ErrorHandler'
-import { adminSchema } from './schema/adminSchema'
-import { AdminRoutes } from './routes/admin.routes'
+import { adminSchema } from './modules/admin/adminSchema'
+import { AdminRoutes } from './modules/admin/admin.routes'
 const server = fastify()
 
 // Declare a route  
