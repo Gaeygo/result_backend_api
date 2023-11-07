@@ -16,38 +16,44 @@ enum AdminRole {
 }
 
 model Admin {
-  id       Int       @id @default(autoincrement())
-  name     String
-  password String
+  id        Int       @id @default(autoincrement())
+  name      String
+  password  String
   // Add other admin-specific fields here
-  subjects Subject[] // Admin can create multiple subjects
-  Class    Class[]
-  role     AdminRole
+  subjects  Subject[] // Admin can create multiple subjects
+  Class     Class[]
+  role      AdminRole
   disabled  Boolean   @default(true)
+  Teacher   Teacher[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Student {
   id         Int       @id @default(autoincrement())
-  firstname  String
-  lastname   String
-  middlename String?
+  firstName  String
+  lastName   String
+  middleName String?
   class      String
   password   String
   subjects   Subject[] // A student can register for multiple subjects
   grades     String[]
   Class      Class?    @relation(fields: [classId], references: [id])
   classId    Int?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Subject {
   id          String    @id @default(uuid())
   subjectName String
   studentId   Int?
-  admins      Admin[] // A subject can be created by multiple admins
+  Admin       Admin     @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
   students    Student[] // Many students can register for a subject
   grades      Grade[] // A subject can have multiple grades
   Teacher     Teacher?  @relation(fields: [teacherId], references: [id])
   teacherId   Int?
+  adminId     Int
 }
 
 model Grade {
@@ -58,15 +64,23 @@ model Grade {
   subjectId String?
   Teacher   Teacher? @relation(fields: [teacherId], references: [id])
   teacherId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Teacher {
   id                 Int       @id @default(autoincrement())
-  name               String
+  firstName          String
+  lastName           String
+  middleName         String?
+  createdBy          Admin     @relation(fields: [adminId], references: [id])
   // Add other teacher-specific fields here
   subjects           Subject[] // A teacher can be assigned to multiple subjects
   grades             Grade[] // A teacher can supply multiple grades
   classAsHeadTeacher Class? // A teacher can be the head teacher of one class (optional)
+  adminId            Int
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
 
 model Class {

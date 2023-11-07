@@ -23,7 +23,7 @@ export const createAdmin = async (request: FastifyRequest<{
 
 }
 
-
+//suspend an admin and can be done by superAdmin
 export const suspendAdmin = async (request: FastifyRequest<{ Body: AdminSuspendBody }>, response: FastifyReply) => {
     try {
         const adminDetails = await prisma.admin.update({

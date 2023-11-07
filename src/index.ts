@@ -2,7 +2,34 @@ import fastify from 'fastify'
 import { errorHandler } from './lib/ErrorHandler'
 import { adminSchema } from './modules/admin/adminSchema'
 import { AdminRoutes } from './modules/admin/admin.routes'
+import dotenv from 'dotenv';
+
+
+// Initialize environment variables from .env file
+
 const server = fastify()
+dotenv.config();
+
+//Adding autocompletion for user object on request
+declare module 'fastify' {
+	interface FastifyRequest {
+		user: {
+			id: string | number,
+			name: string,
+			role: string
+		}
+	}
+}
+
+declare global {
+	namespace NodeJS {
+		interface ProcessEnv {
+			JWTTOKEN: string,
+			DATABASE_URL: string
+
+		}
+	}
+}
 
 // Declare a route  
 server.get('/', function (request, reply) {
