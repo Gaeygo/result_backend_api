@@ -22,7 +22,7 @@ model Admin {
   // Add other admin-specific fields here
   subjects  Subject[] // Admin can create multiple subjects
   Class     Class[]
-  role      AdminRole
+  role      AdminRole @default(ADMIN)
   disabled  Boolean   @default(true)
   Teacher   Teacher[]
   createdAt DateTime  @default(now())
@@ -50,10 +50,12 @@ model Subject {
   studentId   Int?
   Admin       Admin     @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
   students    Student[] // Many students can register for a subject
+  class       Class     @relation(fields: [classId], references: [id])
   grades      Grade[] // A subject can have multiple grades
   Teacher     Teacher?  @relation(fields: [teacherId], references: [id])
   teacherId   Int?
   adminId     Int
+  classId     Int
 }
 
 model Grade {
@@ -92,4 +94,5 @@ model Class {
   students  Student[] // A class can have multiple students
   teacherId Int       @unique
   teacher   Teacher   @relation(fields: [teacherId], references: [id])
+  Subject   Subject[]
 }

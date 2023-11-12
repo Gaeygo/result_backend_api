@@ -39,15 +39,19 @@ server.get('/', function (request, reply) {
 //Register error middleware
 server.setErrorHandler(errorHandler)
 
-//Register admin routes
-server.register(AdminRoutes, { prefix: "/api/admin" })
 
 // Run the server!  
 async function main() {
-	server.listen({ port: 3000 }, function (err, address) {
-		for (const schema of [...adminSchema]) {
-			server.addSchema(schema)
-		}
+	//register schemas
+	for (const schema of [...adminSchema]) {
+		server.addSchema(schema)
+	}
+
+	//Register admin routes
+	server.register(AdminRoutes, { prefix: "/api/admin" })
+
+	server.listen({ port: 5000 }, function (err, address) {
+
 		if (err) {
 			server.log.error(err)
 			process.exit(1)

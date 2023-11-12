@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify"
 import { verifyToken } from "./authjwt"
 import HttpException from "../schema/error"
 import { JwtPayload } from "jsonwebtoken"
+import { ROLEENUM } from "../modules/admin/adminSchema"
 
 export const authVerify = async<T, K>(request: FastifyRequest<{
     Body: T,
@@ -18,3 +19,13 @@ export const authVerify = async<T, K>(request: FastifyRequest<{
 
 }
 
+export const checkRole = async<T, K>(request: FastifyRequest<{
+    Body: T,
+    Querystring: K,
+
+
+}>, response: FastifyReply) => {
+    const role = request.user.role as ROLEENUM
+    if (role === "ADMIN") throw new HttpException(403, "Admin is authorised to perform such action")
+
+}

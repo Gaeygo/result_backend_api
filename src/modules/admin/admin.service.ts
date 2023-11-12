@@ -16,7 +16,7 @@ export async function createSubject(data: CreateSubjectInput & { adminId: number
     })
 }
 
-export async function createStudent(data: CreateStudentInput) {
+export async function createStudent(data: CreateStudentInput & { adminId: number }) {
     return await prisma.student.create({
         data: {
             ...data
@@ -24,7 +24,7 @@ export async function createStudent(data: CreateStudentInput) {
     })
 }
 
-export async function createClass(data: CreateClassInput) {
+export async function createClass(data: CreateClassInput& { adminId: number }) {
     return await prisma.class.create({
         data: {
             ...data

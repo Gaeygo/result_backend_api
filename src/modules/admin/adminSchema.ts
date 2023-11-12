@@ -2,9 +2,14 @@ import { z } from "zod"
 import { buildJsonSchemas } from "fastify-zod"
 
 
+const roleEnum = z.enum(["ADMIN", "SUPERADMIN"])
+
+export type ROLEENUM = z.infer<typeof roleEnum>
+
 const adminCreateSchema = z.object({
     name: z.string(),
-    password: z.string()
+    password: z.string(),
+    role: roleEnum.optional()
 })
 
 const adminSuspendSchema = z.object({
@@ -29,14 +34,14 @@ const studentCreateSchema = z.object({
 
 const createClassInput = z.object({
     name: z.string(),
-    adminId: z.number(),
     teacherId: z.number()
 
 })
 
 const subjectInputSchema = z.object({
     subjectName: z.string(),
-    
+    classId: z.number(),
+
 })
 
 export type AdminCreateInput = z.infer<typeof adminCreateSchema>
