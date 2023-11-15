@@ -52,7 +52,7 @@ export const suspendAdmin = async (request: FastifyRequest<{ Body: AdminSuspendB
     }
 }
 
-//Send email for approval of creation
+//Send email for approval of creation || send details to phone number
 
 //creation of Teachers
 export const registerTeacher = async (request: FastifyRequest<{
@@ -60,6 +60,7 @@ export const registerTeacher = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const teacher = await createTeacher({ ...request.body, adminId: +request.user.id })
+        response.send({message: "Teacher registered", status: 201})
     } catch (error) {
         throw error
     }
@@ -71,6 +72,8 @@ export const registerClass = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const createdClass = await createClass({ ...request.body, adminId: +request.user.id })
+        response.send({message: "Class registered", status: 201})
+
     } catch (error) {
         throw error
     }
@@ -82,6 +85,8 @@ export const registerSubject = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const subject = await createSubject({ ...request.body, adminId: +request.user.id })
+        response.send({message: "Subject registered", status: 201})
+
     } catch (error) {
         throw error
     }
@@ -93,6 +98,8 @@ export const registerStudent = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const student = await createStudent({ ...request.body, adminId: +request.user.id })
+        response.send({message: "Student registered", status: 201})
+
     } catch (error) {
         throw error
     }
