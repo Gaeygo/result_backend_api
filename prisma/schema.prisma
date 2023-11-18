@@ -30,44 +30,52 @@ model Admin {
 }
 
 model Student {
-  id         Int       @id @default(autoincrement())
-  firstName  String
-  lastName   String
-  middleName String?
-  class      String
-  password   String
-  subjects   Subject[] // A student can register for multiple subjects
-  grades     String[]
-  Class      Class?    @relation(fields: [classId], references: [id])
-  classId    Int?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id               Int                @id @default(autoincrement())
+  firstName        String
+  lastName         String
+  middleName       String?
+  class            String
+  password         String
+  courses_enrolled CourseEnrollment[] // A student can register for multiple subjects
+  grades           String[]
+  Class            Class              @relation(fields: [classId], references: [id])
+  classId          Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  active           Boolean
+  Session          Session[]
+  subjects         Subject[]
 }
 
 model Subject {
-  id          String    @id @default(uuid())
-  subjectName String
-  studentId   Int?
-  Admin       Admin     @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
-  students    Student[] // Many students can register for a subject
-  class       Class     @relation(fields: [classId], references: [id])
-  grades      Grade[] // A subject can have multiple grades
-  Teacher     Teacher?  @relation(fields: [teacherId], references: [id])
-  teacherId   Int?
-  adminId     Int
-  classId     Int
+  id                String             @id @default(uuid())
+  subjectName       String
+  studentId         Int?
+  Admin             Admin              @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
+  students          Student[] // Many students can register for a subject
+  class             Class              @relation(fields: [classId], references: [id])
+  grades            Grade[] // A subject can have multiple grades
+  Teacher           Teacher?           @relation(fields: [teacherId], references: [id])
+  teacherId         Int?
+  adminId           Int
+  classId           Int
+  course_enrollment CourseEnrollment[]
+  Session           Session?           @relation(fields: [sessionId], references: [id])
+  sessionId         Int?
 }
 
 model Grade {
-  id        String   @id @default(uuid())
-  value     Float // You can adjust the data type as needed (e.g., Int for integer grades)
-  tutorNote String?
-  Subject   Subject? @relation(fields: [subjectId], references: [id])
-  subjectId String?
-  Teacher   Teacher? @relation(fields: [teacherId], references: [id])
-  teacherId Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String           @id @default(uuid())
+  value              Float // You can adjust the data type as needed (e.g., Int for integer grades)
+  tutorNote          String?
+  Subject            Subject          @relation(fields: [subjectId], references: [id])
+  subjectId          String
+  Teacher            Teacher          @relation(fields: [teacherId], references: [id])
+  teacherId          Int
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  course_enrollment  CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
+  courseEnrollmentId String           @unique
 }
 
 model Teacher {
@@ -83,6 +91,7 @@ model Teacher {
   adminId            Int
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  active             Boolean
 }
 
 model Class {
@@ -94,5 +103,26 @@ model Class {
   students  Student[] // A class can have multiple students
   teacherId Int       @unique
   teacher   Teacher   @relation(fields: [teacherId], references: [id])
-  Subject   Subject[]
+  subject   Subject[]
+  active    Boolean
+}
+
+model Session {
+  id                  Int                @id @default(autoincrement())
+  year                Int
+  course_enrollment   CourseEnrollment[]
+  subject             Subject[]
+  registered_students Student[]
+}
+
+model CourseEnrollment {
+  id        String  @id @default(uuid())
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  Session   Session @relation(fields: [sessionId], references: [id])
+  sessionId Int
+  Student   Student @relation(fields: [studentId], references: [id])
+  studentId Int
+  subjectId String
+
+  grade Grade?
 }

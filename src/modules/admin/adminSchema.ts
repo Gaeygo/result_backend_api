@@ -20,6 +20,7 @@ const teacherCreateSchema = z.object({
     firstName: z.string(),
     middleName: z.string().optional(),
     lastName: z.string(),
+    active: z.boolean()
 
 })
 
@@ -29,18 +30,23 @@ const studentCreateSchema = z.object({
     lastName: z.string(),
     password: z.string(),
     class: z.string(),
+    active: z.boolean(),
+    classId: z.number()
 
 })
 
 const createClassInput = z.object({
     name: z.string(),
-    teacherId: z.number()
+    teacherId: z.number(),
+    active: z.boolean()
 
 })
 
 const subjectInputSchema = z.object({
     subjectName: z.string(),
     classId: z.number(),
+    active: z.boolean()
+
 
 })
 
