@@ -50,12 +50,19 @@ const subjectInputSchema = z.object({
 
 })
 
+const courseEnrollmentSchema = z.object({
+    studentId: z.number(),
+    sessionId: z.number(),
+    subjectId: z.string()
+})
+
 export type AdminCreateInput = z.infer<typeof adminCreateSchema>
 export type AdminSuspendBody = z.infer<typeof adminSuspendSchema>
 export type CreateTeacherInput = z.infer<typeof teacherCreateSchema>
 export type CreateSubjectInput = z.infer<typeof subjectInputSchema>
 export type CreateStudentInput = z.infer<typeof studentCreateSchema>
 export type CreateClassInput = z.infer<typeof createClassInput>
+export type courseEnrollmentInput = z.infer<typeof courseEnrollmentSchema>
 
 export const { schemas: adminSchema, $ref } = buildJsonSchemas({
     adminCreateSchema, adminSuspendSchema, teacherCreateSchema, subjectInputSchema, studentCreateSchema, createClassInput

@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
-import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, CreateSubjectInput, CreateTeacherInput } from "./adminSchema";
+import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, CreateSubjectInput, CreateTeacherInput, courseEnrollmentInput } from "./adminSchema";
 import { createClass, createStudent, createSubject, createTeacher } from "./admin.service";
 
 
@@ -60,7 +60,7 @@ export const registerTeacher = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const teacher = await createTeacher({ ...request.body, adminId: +request.user.id })
-        response.send({message: "Teacher registered", status: 201})
+        response.send({ message: "Teacher registered", status: 201 })
     } catch (error) {
         throw error
     }
@@ -72,7 +72,7 @@ export const registerClass = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const createdClass = await createClass({ ...request.body, adminId: +request.user.id })
-        response.send({message: "Class registered", status: 201})
+        response.send({ message: "Class registered", status: 201 })
 
     } catch (error) {
         throw error
@@ -85,7 +85,7 @@ export const registerSubject = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const subject = await createSubject({ ...request.body, adminId: +request.user.id })
-        response.send({message: "Subject registered", status: 201})
+        response.send({ message: "Subject registered", status: 201 })
 
     } catch (error) {
         throw error
@@ -98,9 +98,21 @@ export const registerStudent = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const student = await createStudent({ ...request.body, adminId: +request.user.id })
-        response.send({message: "Student registered", status: 201})
+        response.send({ message: "Student registered", status: 201 })
 
     } catch (error) {
         throw error
     }
 }
+
+export const studentCourseEnrollment = async (request: FastifyRequest<{
+    Body: courseEnrollmentInput
+}>, response: FastifyReply) => {
+    const courseEnrolled = await prisma.courseEnrollment.create({
+        data: request.body
+    })
+
+}
+
+
+//TODO:
