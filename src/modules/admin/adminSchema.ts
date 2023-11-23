@@ -1,15 +1,19 @@
 import { z } from "zod"
 import { buildJsonSchemas } from "fastify-zod"
+import { type } from "os"
 
 
-const roleEnum = z.enum(["ADMIN", "SUPERADMIN"])
+const roleEnum = z.enum(["ADMIN", "SUPERADMIN", "TEACHER", "STUDENT"])
 
+const adminEnum = z.enum(["ADMIN", "SUPERADMIN"])
 export type ROLEENUM = z.infer<typeof roleEnum>
+export type ADMINENUM = z.infer<typeof adminEnum>
+
 
 const adminCreateSchema = z.object({
     name: z.string(),
     password: z.string(),
-    role: roleEnum.optional()
+    role: adminEnum.optional()
 })
 
 const adminSuspendSchema = z.object({

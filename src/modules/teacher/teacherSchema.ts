@@ -14,4 +14,6 @@ export type AddGradeInput = z.infer<typeof addGrade>
 
 
 
-export const { schemas: teacherSchema, $ref } = buildJsonSchemas({}, { $id: "Teacher" })
+export const { schemas: teacherSchema, $ref } = buildJsonSchemas({
+    addGrade
+}, { $id: "Teacher" })

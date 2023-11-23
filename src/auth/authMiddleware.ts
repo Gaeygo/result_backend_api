@@ -1,9 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify"
 import { verifyToken } from "./authjwt"
 import HttpException from "../schema/error"
-import { JwtPayload } from "jsonwebtoken"
-import { ROLEENUM } from "../modules/admin/adminSchema"
-import { log } from "console"
+import { ADMINENUM, ROLEENUM } from "../modules/admin/adminSchema"
 
 export const authVerify = async<T, K>(request: FastifyRequest<{
     Body: T,
@@ -20,16 +18,17 @@ export const authVerify = async<T, K>(request: FastifyRequest<{
 
 }
 
-export const checkRole = async<T, K>(request: FastifyRequest<{
-    Body: T,
-    Querystring: K,
 
 
-}>, response: FastifyReply) => {
-    const role = request.user.role as ROLEENUM
-    const routeAddress = request.routerPath;
-    console.log(routeAddress)
+export const authMiddleware = <TRole extends ROLEENUM, T, K>(allowedRoles: TRole[]) => {
+    return async (req: FastifyRequest<{
+        Body: T,
+        Querystring: K,
+    }>, rep: FastifyReply) => {
+        const userRole = req.user.role as TRole;
 
-    if (role === "ADMIN" && routeAddress === "/api/admin/createAdmin") throw new HttpException(403, "Admin is not authorised to perform such action")
-
+        if (!allowedRoles.includes(userRole)) {
+            rep.status(403).send({ message: 'Unauthorized: You do not have permission to access this resource.' });
+        }
+    };
 }

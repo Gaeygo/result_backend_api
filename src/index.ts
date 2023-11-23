@@ -3,6 +3,8 @@ import { errorHandler } from './lib/ErrorHandler'
 import { adminSchema } from './modules/admin/adminSchema'
 import { AdminRoutes } from './modules/admin/admin.routes'
 import dotenv from 'dotenv';
+import { teacherSchema } from './modules/teacher/teacherSchema';
+import { authMiddleware } from './auth/authMiddleware';
 
 
 // Initialize environment variables from .env file
@@ -31,19 +33,27 @@ declare global {
 	}
 }
 
+server.decorate("auth", authMiddleware)
+
 // Declare a route  
-server.get('/', function (request, reply) {
+server.get('/',function (request, reply) {
 	reply.send({ hello: 'world' })
+	
+
 })
 
 //Register error middleware
 server.setErrorHandler(errorHandler)
 
 
+
+
 // Run the server!  
 async function main() {
+
+
 	//register schemas
-	for (const schema of [...adminSchema]) {
+	for (const schema of [...adminSchema, ...teacherSchema]) {
 		server.addSchema(schema)
 	}
 
