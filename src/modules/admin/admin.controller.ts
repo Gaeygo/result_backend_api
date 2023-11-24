@@ -12,7 +12,8 @@ export const createAdmin = async (request: FastifyRequest<{
             data: {
                 name: request.body.name,
                 password: request.body.password,
-                role: request.body.role
+                role: request.body.role,
+                
             },
             select: {
                 name: true,

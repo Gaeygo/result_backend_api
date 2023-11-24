@@ -24,7 +24,10 @@ const teacherCreateSchema = z.object({
     firstName: z.string(),
     middleName: z.string().optional(),
     lastName: z.string(),
-    active: z.boolean()
+    active: z.boolean(),
+    phonenumber: z.number(),
+    password: z.string()
+
 
 })
 
@@ -35,7 +38,8 @@ const studentCreateSchema = z.object({
     password: z.string(),
     class: z.string(),
     active: z.boolean(),
-    classId: z.number()
+    classId: z.number(),
+    phonenumber: z.number()
 
 })
 

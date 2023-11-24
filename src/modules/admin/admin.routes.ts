@@ -8,7 +8,7 @@ export async function AdminRoutes(server: FastifyInstance) {
         schema: {
             body: $ref("adminCreateSchema")
         },
-        preHandler: [authVerify<AdminCreateInput, {}>, authMiddleware<ROLEENUM, AdminCreateInput, {}>(["SUPERADMIN"])],
+        preHandler: [authVerify<AdminCreateInput, {}>, authMiddleware<AdminCreateInput, {}>(["SUPERADMIN"])],
 
     }, createAdmin)
 
@@ -16,21 +16,21 @@ export async function AdminRoutes(server: FastifyInstance) {
         schema: {
             body: $ref("adminSuspendSchema")
         },
-        preHandler: [authVerify<AdminSuspendBody, {}>, authMiddleware<ROLEENUM, AdminSuspendBody, {}>(["SUPERADMIN"])],
+        preHandler: [authVerify<AdminSuspendBody, {}>, authMiddleware<AdminSuspendBody, {}>(["SUPERADMIN"])],
     }, suspendAdmin)
 
     server.post("registerStudent", {
         schema: {
             body: $ref("studentCreateSchema")
         },
-        preHandler: [authVerify<CreateStudentInput, {}>, authMiddleware<ROLEENUM, CreateStudentInput, {}>(["SUPERADMIN", "ADMIN"])]
+        preHandler: [authVerify<CreateStudentInput, {}>, authMiddleware<CreateStudentInput, {}>(["SUPERADMIN", "ADMIN"])]
     }, registerStudent)
 
     server.post("registerTeacher", {
         schema: {
             body: $ref("teacherCreateSchema")
         },
-        preHandler: [authVerify<CreateTeacherInput, {}>, authMiddleware<ROLEENUM, CreateTeacherInput, {}>(["SUPERADMIN", "ADMIN"])]
+        preHandler: [authVerify<CreateTeacherInput, {}>, authMiddleware<CreateTeacherInput, {}>(["SUPERADMIN", "ADMIN"])]
 
 
     }, registerTeacher)
@@ -39,7 +39,7 @@ export async function AdminRoutes(server: FastifyInstance) {
         schema: {
             body: $ref("createClassInput")
         },
-        preHandler: [authVerify<CreateClassInput, {}>, authMiddleware<ROLEENUM, CreateClassInput, {}>(["SUPERADMIN", "ADMIN"])]
+        preHandler: [authVerify<CreateClassInput, {}>, authMiddleware<CreateClassInput, {}>(["SUPERADMIN", "ADMIN"])]
 
 
     }, registerClass)
@@ -48,7 +48,7 @@ export async function AdminRoutes(server: FastifyInstance) {
         schema: {
             body: $ref("subjectInputSchema")
         },
-        preHandler: [authVerify<CreateSubjectInput, {}>, authMiddleware<ROLEENUM, CreateSubjectInput, {}>(["SUPERADMIN", "ADMIN"])]
+        preHandler: [authVerify<CreateSubjectInput, {}>, authMiddleware<CreateSubjectInput, {}>(["SUPERADMIN", "ADMIN"])]
 
 
     }, registerSubject)

@@ -16,8 +16,8 @@ enum AdminRole {
 }
 
 model Admin {
-  id        Int       @id @default(autoincrement())
-  name      String
+  id        Int       @id @unique @default(autoincrement())
+  name      String    @unique
   password  String
   // Add other admin-specific fields here
   subjects  Subject[] // Admin can create multiple subjects
@@ -30,10 +30,11 @@ model Admin {
 }
 
 model Student {
-  id               Int                @id @default(autoincrement())
+  id               Int                @id @unique @default(autoincrement())
   firstName        String
   lastName         String
   middleName       String?
+  phonenumber      Int                @unique
   class            String
   password         String
   courses_enrolled CourseEnrollment[] // A student can register for multiple subjects
@@ -79,7 +80,7 @@ model Grade {
 }
 
 model Teacher {
-  id                 Int       @id @default(autoincrement())
+  id                 Int       @id @unique @default(autoincrement())
   firstName          String
   lastName           String
   middleName         String?
@@ -92,6 +93,8 @@ model Teacher {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   active             Boolean
+  phonenumber        Int       @unique
+  password           String
 }
 
 model Class {

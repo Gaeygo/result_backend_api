@@ -10,12 +10,12 @@ export async function TeacherRoutes(server: FastifyInstance) {
         schema: {
             body: $ref("addGrade")
         },
-        preValidation: [authVerify<AddGradeInput, {}>, authMiddleware<ROLEENUM, AddGradeInput, {}>(["TEACHER"])]
+        preValidation: [authVerify<AddGradeInput, {}>, authMiddleware< AddGradeInput, {}>(["TEACHER"])]
 
     }, addGrade)
 
     server.post("/view-grades", {
-        preValidation: [authVerify<{ subjectId: string }, {}>, authMiddleware<ROLEENUM, { subjectId: string }, {}>(["TEACHER"])]
+        preValidation: [authVerify<{ subjectId: string }, {}>, authMiddleware< { subjectId: string }, {}>(["TEACHER"])]
     }, getGrades)
 
 }

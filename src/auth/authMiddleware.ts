@@ -20,12 +20,17 @@ export const authVerify = async<T, K>(request: FastifyRequest<{
 
 
 
-export const authMiddleware = <TRole extends ROLEENUM, T, K>(allowedRoles: TRole[]) => {
+export const authMiddleware = <T, K>(allowedRoles: ROLEENUM[]) => {
     return async (req: FastifyRequest<{
         Body: T,
         Querystring: K,
     }>, rep: FastifyReply) => {
-        const userRole = req.user.role as TRole;
+        // for (const role of allowedRoles) {
+        //     if ((color)) {
+        //         return false;
+        //     }
+        // }
+        const userRole = req.user.role as ROLEENUM;
 
         if (!allowedRoles.includes(userRole)) {
             rep.status(403).send({ message: 'Unauthorized: You do not have permission to access this resource.' });
