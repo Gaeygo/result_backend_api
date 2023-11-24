@@ -6,7 +6,9 @@ import { type } from "os"
 const roleEnum = z.enum(["ADMIN", "SUPERADMIN", "TEACHER", "STUDENT"])
 
 const adminEnum = z.enum(["ADMIN", "SUPERADMIN"])
-export type ROLEENUM = z.infer<typeof roleEnum>
+export enum ROLEENUM {
+    SUPERADMIN, ADMIN, TEACHER, STUDENT
+}
 export type ADMINENUM = z.infer<typeof adminEnum>
 
 

@@ -1,6 +1,6 @@
 import fastify from 'fastify'
 import { errorHandler } from './lib/ErrorHandler'
-import { adminSchema } from './modules/admin/adminSchema'
+import { ROLEENUM, adminSchema } from './modules/admin/adminSchema'
 import { AdminRoutes } from './modules/admin/admin.routes'
 import dotenv from 'dotenv';
 import { teacherSchema } from './modules/teacher/teacherSchema';
@@ -18,7 +18,7 @@ declare module 'fastify' {
 		user: {
 			id: string | number,
 			name: string,
-			role: string
+			role: ROLEENUM
 		}
 	}
 }
@@ -36,9 +36,9 @@ declare global {
 server.decorate("auth", authMiddleware)
 
 // Declare a route  
-server.get('/',function (request, reply) {
+server.get('/', function (request, reply) {
 	reply.send({ hello: 'world' })
-	
+
 
 })
 

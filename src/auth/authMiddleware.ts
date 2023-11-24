@@ -19,17 +19,18 @@ export const authVerify = async<T, K>(request: FastifyRequest<{
 }
 
 
+//Authorisation of users based on their assigned roles, so an array of users "roles" is presented and based on that access is determined
 
 export const authMiddleware = <T, K>(allowedRoles: ROLEENUM[]) => {
     return async (req: FastifyRequest<{
         Body: T,
         Querystring: K,
     }>, rep: FastifyReply) => {
-        // for (const role of allowedRoles) {
-        //     if ((color)) {
-        //         return false;
-        //     }
-        // }
+        for (const role of allowedRoles) {
+            if (!Object.values(ROLEENUM).includes(role)) {
+                return false;
+            }
+        }
         const userRole = req.user.role as ROLEENUM;
 
         if (!allowedRoles.includes(userRole)) {
