@@ -5,6 +5,7 @@ import { AdminRoutes } from './modules/admin/admin.routes'
 import dotenv from 'dotenv';
 import { teacherSchema } from './modules/teacher/teacherSchema';
 import { authMiddleware } from './auth/authMiddleware';
+import { AuthRoute } from './auth/auth.route';
 
 
 // Initialize environment variables from .env file
@@ -33,7 +34,7 @@ declare global {
 	}
 }
 
-server.decorate("auth", authMiddleware)
+// server.decorate("auth", authMiddleware)
 
 // Declare a route  
 server.get('/', function (request, reply) {
@@ -56,9 +57,11 @@ async function main() {
 	for (const schema of [...adminSchema, ...teacherSchema]) {
 		server.addSchema(schema)
 	}
-
+	//register auth routes
+	server.register(AuthRoute, { prefix: "/api/auth" })
 	//Register admin routes
 	server.register(AdminRoutes, { prefix: "/api/admin" })
+
 
 	server.listen({ port: 5000 }, function (err, address) {
 

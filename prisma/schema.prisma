@@ -34,7 +34,7 @@ model Student {
   firstName        String
   lastName         String
   middleName       String?
-  phonenumber      Int                @unique
+  phonenumber      String                @unique
   class            String
   password         String
   courses_enrolled CourseEnrollment[] // A student can register for multiple subjects
@@ -93,7 +93,7 @@ model Teacher {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   active             Boolean
-  phonenumber        Int       @unique
+  phonenumber        String       @unique
   password           String
 }
 

@@ -3,13 +3,23 @@ import { buildJsonSchemas } from "fastify-zod"
 import { type } from "os"
 
 
-const roleEnum = z.enum(["ADMIN", "SUPERADMIN", "TEACHER", "STUDENT"])
 
 const adminEnum = z.enum(["ADMIN", "SUPERADMIN"])
 export enum ROLEENUM {
     SUPERADMIN, ADMIN, TEACHER, STUDENT
 }
+const roleZodEnum = z.enum(["SUPERADMIN", "ADMIN", "TEACHER", "STUDENT"])
+
+export type ZODROLEENUM = z.infer<typeof roleZodEnum>
+
 export type ADMINENUM = z.infer<typeof adminEnum>
+
+export type ROLESENUM = {
+    SUPERADMIN: "SUPERADMIN",
+    ADMIN: "ADMIN",
+    TEACHER: "TEACHER",
+    STUDENT: "STUDENT"
+}
 
 
 const adminCreateSchema = z.object({
@@ -17,6 +27,7 @@ const adminCreateSchema = z.object({
     password: z.string(),
     role: adminEnum.optional()
 })
+
 
 const adminSuspendSchema = z.object({
     adminSuspendId: z.number()
@@ -27,7 +38,7 @@ const teacherCreateSchema = z.object({
     middleName: z.string().optional(),
     lastName: z.string(),
     active: z.boolean(),
-    phonenumber: z.number(),
+    phonenumber: z.string(),
     password: z.string()
 
 
@@ -41,7 +52,7 @@ const studentCreateSchema = z.object({
     class: z.string(),
     active: z.boolean(),
     classId: z.number(),
-    phonenumber: z.number()
+    phonenumber: z.string()
 
 })
 
@@ -66,6 +77,14 @@ const courseEnrollmentSchema = z.object({
     subjectId: z.string()
 })
 
+
+//LOGIN//
+const loginSchema = z.object({
+    userName: z.string(),
+    password: z.string(),
+    userRole: roleZodEnum
+})
+
 export type AdminCreateInput = z.infer<typeof adminCreateSchema>
 export type AdminSuspendBody = z.infer<typeof adminSuspendSchema>
 export type CreateTeacherInput = z.infer<typeof teacherCreateSchema>
@@ -73,7 +92,8 @@ export type CreateSubjectInput = z.infer<typeof subjectInputSchema>
 export type CreateStudentInput = z.infer<typeof studentCreateSchema>
 export type CreateClassInput = z.infer<typeof createClassInput>
 export type courseEnrollmentInput = z.infer<typeof courseEnrollmentSchema>
+export type LoginBodyInput = z.infer<typeof loginSchema>
 
 export const { schemas: adminSchema, $ref } = buildJsonSchemas({
-    adminCreateSchema, adminSuspendSchema, teacherCreateSchema, subjectInputSchema, studentCreateSchema, createClassInput
+    adminCreateSchema, adminSuspendSchema, teacherCreateSchema, subjectInputSchema, studentCreateSchema, createClassInput, loginSchema
 }, { $id: 'Admin' })
