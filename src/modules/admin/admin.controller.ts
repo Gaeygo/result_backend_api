@@ -3,6 +3,7 @@ import prisma from "../../lib/prisma";
 import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, courseEnrollmentInput, CreateSubjectInput } from "./adminSchema";
 import { createClass, createStudent, AssignSubject, createTeacher, createSubject } from "./admin.service";
 import { hashPassword } from "../../auth/password";
+import { generateDatePairs } from "../../utils/GenerateObjects";
 
 
 export const createAdmin = async (request: FastifyRequest<{
@@ -56,6 +57,7 @@ export const suspendAdmin = async (request: FastifyRequest<{ Body: AdminSuspendB
     }
 }
 
+//when a session is created 3 terms should automatically created
 export const createAndInitialiseSession = async (request: FastifyRequest<{
     Body: {
         academicYear: string
@@ -68,8 +70,39 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
                 adminId: +request.user.id
             }
         })
+        if (session) {
+            //TODO:
+            //just for dev needs to be changed later
+            //
+            const startingDate = new Date('2024-09-09');
 
-        response.code(200).send({ message: ` ${session.academicYear} Session created` })
+
+            const dates = generateDatePairs(startingDate, 3, 3, 3)
+            const terms = await prisma.term.createMany({
+                data: [{
+                    sessionId: session.id,
+                    termName: "1st Term",
+                    inTerm: true,
+                    openDate: dates[0][0],
+                    closedDate: dates[0][1]
+                }, {
+                    sessionId: session.id,
+                    termName: "2nd Term",
+                    openDate: dates[1][0],
+                    closedDate: dates[1][1]
+                }, {
+                    sessionId: session.id,
+                    termName: "3rd Term",
+                    openDate: dates[2][0],
+                    closedDate: dates[2][1]
+                },
+                ]
+            })
+
+            response.code(200).send({ message: ` ${session.academicYear} Session created` })
+
+        }
+
     } catch (error) {
         throw error
     }

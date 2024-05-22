@@ -266,6 +266,9 @@ model Term {
   sessionId   Int
   results     Grade[]
   enrollments CourseEnrollment[]
+  openDate    DateTime
+  closedDate  DateTime
+  inTerm      Boolean            @default(false)
 }
 
 model CourseEnrollment {

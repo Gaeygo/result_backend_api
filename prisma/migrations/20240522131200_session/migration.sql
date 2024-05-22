@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Term" ADD COLUMN     "done" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "open" BOOLEAN NOT NULL DEFAULT false;
