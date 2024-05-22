@@ -56,6 +56,26 @@ export const suspendAdmin = async (request: FastifyRequest<{ Body: AdminSuspendB
     }
 }
 
+export const createAndInitialiseSession = async (request: FastifyRequest<{
+    Body: {
+        academicYear: string
+    }
+}>, response: FastifyReply) => {
+    try {
+        const session = await prisma.session.create({
+            data: {
+                academicYear: request.body.academicYear,
+                adminId: +request.user.id
+            }
+        })
+
+        response.code(200).send({ message: ` ${session.academicYear} Session created` })
+    } catch (error) {
+        throw error
+    }
+
+}
+
 //Send email for approval of creation || send details to phone number
 
 //creation of Teachers

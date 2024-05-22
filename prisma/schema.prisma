@@ -158,6 +158,7 @@ model Admin {
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   Subject   Subject[]
+  Session   Session[]
 }
 
 model Student {
@@ -249,11 +250,13 @@ model Class {
 
 model Session {
   id                 Int                @id @default(autoincrement())
-  academicYear       String // E.g., "18/19", "20/21"
+  academicYear       String // E.g., "2018/2019", "2020/2021"
   subjects           SubjectAssigned[]
   registeredStudents Student[]
   terms              Term[]
   CourseEnrollment   CourseEnrollment[]
+  Admin              Admin              @relation(fields: [adminId], references: [id])
+  adminId            Int
 }
 
 model Term {
