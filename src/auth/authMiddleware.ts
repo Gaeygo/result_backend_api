@@ -62,7 +62,9 @@ export const login = async (request: FastifyRequest<{
             const passwordCorrect = await verifyPassword(request.body.password, user.password)
             if (!passwordCorrect) throw new HttpException(403, "User login details are incorrect", "AuthError")
             const token = createToken({ id: user.id, name: user.name, role: role })
-            request.headers["x-access-key"] = token
+            // request.headers["x-access-key"] = token
+            console.log(token)
+            return response.status(200).header("x-access-key", token).send(user)
         }
         else if (role === ROLEENUM.STUDENT) {
             const user = await prisma.student.findUnique({
@@ -74,7 +76,12 @@ export const login = async (request: FastifyRequest<{
             const passwordCorrect = await verifyPassword(request.body.password, user.password)
             if (!passwordCorrect) throw new HttpException(403, "User login details are incorrect", "AuthError")
             const token = createToken({ id: user.id, name: user.firstName, role: role })
-            request.headers["x-access-key"] = token
+            // response.headers["x-access-key"] = token
+            // response.header("accesskey", token)
+            // response.getHeader("accesskey")
+            console.log(token)
+            return response.status(200).header("accesskey", token).send(user)
+
         } else if (role === ROLEENUM.TEACHER) {
             const user = await prisma.teacher.findUnique({
                 where: {
@@ -85,7 +92,9 @@ export const login = async (request: FastifyRequest<{
             const passwordCorrect = await verifyPassword(request.body.password, user.password)
             if (!passwordCorrect) throw new HttpException(403, "User login details are incorrect", "AuthError")
             const token = createToken({ id: user.id, name: user.firstName, role: role })
-            request.headers["x-access-key"] = token
+            // request.headers["x-access-key"] = token
+            return response.status(200).header("accesskey", token).send(user)
+
         }
     } catch (error) {
         throw error

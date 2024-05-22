@@ -1,19 +1,22 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
-import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, CreateSubjectInput, CreateTeacherInput, courseEnrollmentInput } from "./adminSchema";
-import { createClass, createStudent, createSubject, createTeacher } from "./admin.service";
+import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, courseEnrollmentInput, CreateSubjectInput } from "./adminSchema";
+import { createClass, createStudent, AssignSubject, createTeacher, createSubject } from "./admin.service";
+import { hashPassword } from "../../auth/password";
 
 
 export const createAdmin = async (request: FastifyRequest<{
     Body: AdminCreateInput
 }>, response: FastifyReply) => {
     try {
+        console.log(request.body)
+        const password = await hashPassword(request.body.password)
         const adminDetails = await prisma.admin.create({
             data: {
                 name: request.body.name,
-                password: request.body.password,
+                password: password,
                 role: request.body.role,
-                
+
             },
             select: {
                 name: true,
@@ -80,13 +83,26 @@ export const registerClass = async (request: FastifyRequest<{
     }
 }
 
-//register subject
-export const registerSubject = async (request: FastifyRequest<{
+//create subject
+export const addNewSubject = async (request: FastifyRequest<{
     Body: CreateSubjectInput
 }>, response: FastifyReply) => {
     try {
         const subject = await createSubject({ ...request.body, adminId: +request.user.id })
-        response.send({ message: "Subject registered", status: 201 })
+        response.send({ message: "Subject created", status: 201 })
+
+    } catch (error) {
+        throw error
+    }
+}
+
+//register subject
+export const registerAndAssignSubject = async (request: FastifyRequest<{
+    Body: AssignSubjectInput
+}>, response: FastifyReply) => {
+    try {
+        const subjectCreated = await AssignSubject({ ...request.body, adminId: +request.user.id })
+        response.send({ message: "Subject registered", status: 200 })
 
     } catch (error) {
         throw error

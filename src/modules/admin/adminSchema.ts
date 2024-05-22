@@ -1,6 +1,8 @@
 import { z } from "zod"
 import { buildJsonSchemas } from "fastify-zod"
 import { type } from "os"
+import { ClassLevel } from "@prisma/client"
+
 
 
 
@@ -9,6 +11,9 @@ export enum ROLEENUM {
     SUPERADMIN, ADMIN, TEACHER, STUDENT
 }
 const roleZodEnum = z.enum(["SUPERADMIN", "ADMIN", "TEACHER", "STUDENT"])
+
+const gradeLevelEnum = z.enum(["GRADE7", "GRADE8", "GRADE9", "GRADE10", "GRADE11", "GRADE12"])
+const NGgradeEnum = z.enum(["JSS1", "JSS2", "JSS3", "SS1", "SS2", "SS3"])
 
 export type ZODROLEENUM = z.infer<typeof roleZodEnum>
 
@@ -20,6 +25,7 @@ export type ROLESENUM = {
     TEACHER: "TEACHER",
     STUDENT: "STUDENT"
 }
+
 
 
 const adminCreateSchema = z.object({
@@ -49,7 +55,6 @@ const studentCreateSchema = z.object({
     middleName: z.string().optional(),
     lastName: z.string(),
     password: z.string(),
-    class: z.string(),
     active: z.boolean(),
     classId: z.number(),
     phonenumber: z.string()
@@ -58,15 +63,25 @@ const studentCreateSchema = z.object({
 
 const createClassInput = z.object({
     name: z.string(),
-    teacherId: z.number(),
-    active: z.boolean()
+    // teacherId: z.number().optional(),
+    active: z.boolean(),
+    classLevel: z.union([gradeLevelEnum, NGgradeEnum])
 
 })
 
-const subjectInputSchema = z.object({
+const createSubjectInputSchema = z.object({
+    name: z.string(),
+    allowedClassLevels: z.array(z.nativeEnum(ClassLevel))
+    // z.union([gradeLevelEnum, NGgradeEnum]),
+
+})
+
+const assignSubjectInputSchema = z.object({
     subjectName: z.string(),
     classId: z.number(),
-    active: z.boolean()
+    active: z.boolean(),
+    subjectId: z.number(),
+    sessionId: z.number()
 
 
 })
@@ -74,7 +89,8 @@ const subjectInputSchema = z.object({
 const courseEnrollmentSchema = z.object({
     studentId: z.number(),
     sessionId: z.number(),
-    subjectId: z.string()
+    subjectId: z.string(),
+    termId: z.number()
 })
 
 
@@ -88,12 +104,13 @@ const loginSchema = z.object({
 export type AdminCreateInput = z.infer<typeof adminCreateSchema>
 export type AdminSuspendBody = z.infer<typeof adminSuspendSchema>
 export type CreateTeacherInput = z.infer<typeof teacherCreateSchema>
-export type CreateSubjectInput = z.infer<typeof subjectInputSchema>
+export type AssignSubjectInput = z.infer<typeof assignSubjectInputSchema>
+export type CreateSubjectInput = z.infer<typeof createSubjectInputSchema>
 export type CreateStudentInput = z.infer<typeof studentCreateSchema>
 export type CreateClassInput = z.infer<typeof createClassInput>
 export type courseEnrollmentInput = z.infer<typeof courseEnrollmentSchema>
 export type LoginBodyInput = z.infer<typeof loginSchema>
 
 export const { schemas: adminSchema, $ref } = buildJsonSchemas({
-    adminCreateSchema, adminSuspendSchema, teacherCreateSchema, subjectInputSchema, studentCreateSchema, createClassInput, loginSchema
+    adminCreateSchema, adminSuspendSchema, teacherCreateSchema, assignSubjectInputSchema, studentCreateSchema, createClassInput, loginSchema, createSubjectInputSchema
 }, { $id: 'Admin' })

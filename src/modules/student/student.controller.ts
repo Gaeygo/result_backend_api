@@ -9,7 +9,11 @@ const viewGrades = async (request: FastifyRequest, response: FastifyReply) => {
             id: +request.user.id
         },
         select: {
-            grades: true
+            courseEnrollments: {
+                select: {
+                    grades: true
+                }
+            }
         }
     })
 }

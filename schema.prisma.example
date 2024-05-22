@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  SUPERADMIN
+  ADMIN
+}
+
+model Admin {
+  id        Int       @id @unique @default(autoincrement())
+  name      String    @unique
+  password  String
+  // Add other admin-specific fields here
+  subjects  Subject[] // Admin can create multiple subjects
+  Class     Class[]
+  role      AdminRole @default(ADMIN)
+  disabled  Boolean   @default(true)
+  Teacher   Teacher[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Student {
+  id               Int                @id @unique @default(autoincrement())
+  firstName        String
+  lastName         String
+  middleName       String?
+  phonenumber      String             @unique
+  class            String
+  password         String
+  courses_enrolled CourseEnrollment[] // A student can register for multiple subjects
+  grades           Grade[]
+  Class            Class              @relation(fields: [classId], references: [id])
+  classId          Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  active           Boolean
+  Session          Session[]
+  subjects         Subject[]
+}
+
+model Subject {
+  id                  String             @id @default(uuid())
+  subjectName         String
+  studentId           Int?
+  Admin               Admin              @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
+  students            Student[] // Many students can register for a subject
+  class               Class              @relation(fields: [classId], references: [id])
+  grades              Grade[] // A subject can have multiple grades
+  Teacher             Teacher?           @relation(fields: [teacherId], references: [id])
+  teacherId           Int?
+  adminId             Int
+  classId             Int
+  course_enrollment   CourseEnrollment[]
+  Session             Session?           @relation(fields: [sessionId], references: [id])
+  sessionId           Int?
+  CompulsorySubject   CompulsorySubject? @relation(fields: [compulsorySubjectId], references: [id])
+  compulsorySubjectId String?
+  ElectiveSubject     ElectiveSubject?   @relation(fields: [electiveSubjectId], references: [id])
+  electiveSubjectId   String?
+}
+
+model Grade {
+  id                 String           @id @default(uuid())
+  value              Float // You can adjust the data type as needed (e.g., Int for integer grades)
+  tutorNote          String?
+  Subject            Subject          @relation(fields: [subjectId], references: [id])
+  subjectId          String
+  Teacher            Teacher          @relation(fields: [teacherId], references: [id])
+  teacherId          Int
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  course_enrollment  CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
+  courseEnrollmentId String           @unique
+  Student            Student?         @relation(fields: [studentId], references: [id])
+  studentId          Int?
+}
+
+model Teacher {
+  id                 Int       @id @unique @default(autoincrement())
+  firstName          String
+  lastName           String
+  middleName         String?
+  createdBy          Admin     @relation(fields: [adminId], references: [id])
+  // Add other teacher-specific fields here
+  subjects           Subject[] // A teacher can be assigned to multiple subjects
+  grades             Grade[] // A teacher can supply multiple grades
+  classAsHeadTeacher Class? // A teacher can be the head teacher of one class (optional)
+  adminId            Int
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  active             Boolean
+  phonenumber        String    @unique
+  password           String
+}
+
+model Class {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  // Add other class-specific fields here
+  adminId           Int
+  admin             Admin               @relation(fields: [adminId], references: [id])
+  students          Student[] // A class can have multiple students
+  teacherId         Int                 @unique
+  teacher           Teacher             @relation(fields: [teacherId], references: [id])
+  subject           Subject[]
+  active            Boolean
+  classLevel        String
+  CompulsorySubject CompulsorySubject[]
+  ElectiveSubject   ElectiveSubject[]
+}
+
+model CompulsorySubject {
+  id       String    @id @default(uuid())
+  subjects Subject[]
+  class    Class     @relation(fields: [classId], references: [id])
+  classId  Int
+}
+
+model ElectiveSubject {
+  id       String    @id @default(uuid())
+  subjects Subject[]
+  class    Class     @relation(fields: [classId], references: [id])
+  classId  Int
+}
+
+model Session {
+  id                  Int                @id @default(autoincrement())
+  year                Int
+  course_enrollment   CourseEnrollment[]
+  subject             Subject[]
+  registered_students Student[]
+}
+
+model CourseEnrollment {
+  id        String  @id @default(uuid())
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  Session   Session @relation(fields: [sessionId], references: [id])
+  sessionId Int
+  Student   Student @relation(fields: [studentId], references: [id])
+  studentId Int
+  subjectId String
+
+  grade Grade?
+}

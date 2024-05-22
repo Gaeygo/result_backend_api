@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify"
-import { createAdmin, registerClass, registerStudent, registerSubject, registerTeacher, suspendAdmin } from "./admin.controller"
-import { $ref, AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, CreateSubjectInput, CreateTeacherInput, ROLEENUM } from "./adminSchema"
+import { createAdmin, registerClass, registerStudent, registerAndAssignSubject, registerTeacher, suspendAdmin } from "./admin.controller"
+import { $ref, AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, ROLEENUM } from "./adminSchema"
 import { authVerify, authMiddleware } from "../../auth/authMiddleware"
 
 export async function AdminRoutes(server: FastifyInstance) {
@@ -44,12 +44,12 @@ export async function AdminRoutes(server: FastifyInstance) {
 
     }, registerClass)
 
-    server.post("registerSubject", {
+    server.post("assignSubject", {
         schema: {
-            body: $ref("subjectInputSchema")
+            body: $ref("assignSubjectInputSchema")
         },
-        preHandler: [authVerify<CreateSubjectInput, {}>, authMiddleware<CreateSubjectInput, {}>([ROLEENUM.SUPERADMIN, ROLEENUM.ADMIN])]
+        preHandler: [authVerify<AssignSubjectInput, {}>, authMiddleware<AssignSubjectInput, {}>([ROLEENUM.SUPERADMIN, ROLEENUM.ADMIN])]
 
 
-    }, registerSubject)
+    }, registerAndAssignSubject)
 }
