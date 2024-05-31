@@ -161,6 +161,29 @@ model Admin {
   Session   Session[]
 }
 
+model Session {
+  id                 Int                @id @default(autoincrement())
+  academicYear       String // E.g., "2018/2019", "2020/2021"
+  registeredStudents Student[]
+  terms              Term[]
+  CourseEnrollment   CourseEnrollment[]
+  Admin              Admin              @relation(fields: [adminId], references: [id])
+  adminId            Int
+  ClassAssignment    ClassAssignment[]
+}
+
+model Term {
+  id          Int                @id @default(autoincrement())
+  termName    String // E.g., "Term 1", "Term 2", "Term 3"
+  session     Session            @relation(fields: [sessionId], references: [id])
+  sessionId   Int
+  results     Grade[]
+  enrollments CourseEnrollment[]
+  openDate    DateTime
+  closedDate  DateTime
+  inTerm      Boolean            @default(false)
+}
+
 model Student {
   id                Int                @id @unique @default(autoincrement())
   firstName         String
@@ -169,12 +192,12 @@ model Student {
   phonenumber       String             @unique
   password          String
   courseEnrollments CourseEnrollment[] // A student can register for multiple subjects
-  class             Class              @relation(fields: [classId], references: [id])
   classId           Int
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   active            Boolean
   sessions          Session[]
+  ClassAssignment   ClassAssignment[]
 }
 
 //add subject option inlude subject name and subject/class level
@@ -213,10 +236,68 @@ model SubjectAssigned {
   teacher           Teacher?           @relation(fields: [teacherId], references: [id])
   teacherId         Int?
   courseEnrollments CourseEnrollment[]
-  session           Session            @relation(fields: [sessionId], references: [id])
   isElective        Boolean            @default(false)
   subjectId         Int
+}
+
+
+
+model Class {
+  id              Int               @id @default(autoincrement())
+  name            String
+  admin           Admin             @relation(fields: [adminId], references: [id])
+  adminId         Int
+  classTeacher         Teacher?          @relation(fields: [teacherId], references: [id])
+  teacherId       Int?              @unique
+  subjects        SubjectAssigned[]
+  active          Boolean
+  classLevel      ClassLevel
+  // CourseEnrollment CourseEnrollment[]
+  ClassAssignment ClassAssignment[]
+}
+
+
+
+model CourseEnrollment {
+  id                String          @id @unique @default(uuid())
+  student           Student         @relation(fields: [studentId], references: [id])
+  studentId         Int
+  subject           SubjectAssigned @relation(fields: [subjectId], references: [id])
+  subjectId         String
+  session           Session         @relation(fields: [sessionId], references: [id])
   sessionId         Int
+  term              Term            @relation(fields: [termId], references: [id])
+  termId            Int
+  grades            Grade[]
+  // class     Class           @relation(fields: [classId], references: [id])
+  // classId   Int
+  ClassAssignment   ClassAssignment @relation(fields: [classAssignmentId], references: [id])
+  classAssignmentId Int
+}
+
+model ClassAssignment {
+  id               Int                @id @unique @default(autoincrement())
+  student          Student            @relation(fields: [studentId], references: [id])
+  studentId        Int
+  class            Class              @relation(fields: [classId], references: [id])
+  classId          Int
+  session          Session            @relation(fields: [sessionId], references: [id])
+  sessionId        Int
+  assignedAt       DateTime           @default(now())
+  CourseEnrollment CourseEnrollment[]
+}
+
+
+model Grade {
+  id                 String           @id @default(uuid())
+  value              Float // You can adjust the data type as needed (e.g., Int for integer grades)
+  tutorNote          String?
+  courseEnrollment   CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
+  courseEnrollmentId String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  Term               Term?            @relation(fields: [termId], references: [id])
+  termId             Int?
 }
 
 model Teacher {
@@ -233,67 +314,6 @@ model Teacher {
   active             Boolean
   phonenumber        String            @unique
   password           String
-}
-
-model Class {
-  id         Int               @id @default(autoincrement())
-  name       String
-  admin      Admin             @relation(fields: [adminId], references: [id])
-  adminId    Int
-  students   Student[] // A class can have multiple students
-  teacher    Teacher?          @relation(fields: [teacherId], references: [id])
-  teacherId  Int?              @unique
-  subjects   SubjectAssigned[]
-  active     Boolean
-  classLevel ClassLevel
-}
-
-model Session {
-  id                 Int                @id @default(autoincrement())
-  academicYear       String // E.g., "2018/2019", "2020/2021"
-  subjects           SubjectAssigned[]
-  registeredStudents Student[]
-  terms              Term[]
-  CourseEnrollment   CourseEnrollment[]
-  Admin              Admin              @relation(fields: [adminId], references: [id])
-  adminId            Int
-}
-
-model Term {
-  id          Int                @id @default(autoincrement())
-  termName    String // E.g., "Term 1", "Term 2", "Term 3"
-  session     Session            @relation(fields: [sessionId], references: [id])
-  sessionId   Int
-  results     Grade[]
-  enrollments CourseEnrollment[]
-  openDate    DateTime
-  closedDate  DateTime
-  inTerm      Boolean            @default(false)
-}
-
-model CourseEnrollment {
-  id        String          @id @default(uuid())
-  student   Student         @relation(fields: [studentId], references: [id])
-  studentId Int
-  subject   SubjectAssigned @relation(fields: [subjectId], references: [id])
-  subjectId String
-  session   Session         @relation(fields: [sessionId], references: [id])
-  sessionId Int
-  term      Term            @relation(fields: [termId], references: [id])
-  termId    Int
-  grades    Grade[]
-}
-
-model Grade {
-  id                 String           @id @default(uuid())
-  value              Float // You can adjust the data type as needed (e.g., Int for integer grades)
-  tutorNote          String?
-  courseEnrollment   CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
-  courseEnrollmentId String
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-  Term               Term?            @relation(fields: [termId], references: [id])
-  termId             Int?
 }
 
 //registerable subjects

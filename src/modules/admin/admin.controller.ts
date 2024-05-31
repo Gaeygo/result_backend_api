@@ -175,6 +175,7 @@ export const registerStudent = async (request: FastifyRequest<{
     }
 }
 
+// first enroll in a class, then run course enrollement
 export const studentCourseEnrollment = async (request: FastifyRequest<{
     Body: courseEnrollmentInput
 }>, response: FastifyReply) => {

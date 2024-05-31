@@ -90,7 +90,14 @@ const courseEnrollmentSchema = z.object({
     studentId: z.number(),
     sessionId: z.number(),
     subjectId: z.string(),
-    termId: z.number()
+    termId: z.number(),
+    classAssignmentId: z.number()
+})
+
+const studentClassAssignmentSchema = z.object({
+    studentId: z.number(),
+    classId: z.number(),
+    sessionId: z.number()
 })
 
 
@@ -110,7 +117,8 @@ export type CreateStudentInput = z.infer<typeof studentCreateSchema>
 export type CreateClassInput = z.infer<typeof createClassInput>
 export type courseEnrollmentInput = z.infer<typeof courseEnrollmentSchema>
 export type LoginBodyInput = z.infer<typeof loginSchema>
+export type StudentClassAssignmentInput = z.infer<typeof studentClassAssignmentSchema>
 
 export const { schemas: adminSchema, $ref } = buildJsonSchemas({
-    adminCreateSchema, adminSuspendSchema, teacherCreateSchema, assignSubjectInputSchema, studentCreateSchema, createClassInput, loginSchema, createSubjectInputSchema
+    adminCreateSchema, adminSuspendSchema, teacherCreateSchema, studentClassAssignmentSchema, assignSubjectInputSchema, studentCreateSchema, createClassInput, loginSchema, createSubjectInputSchema
 }, { $id: 'Admin' })

@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma";
-import { CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, CreateSubjectInput } from "./adminSchema";
+import { CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, CreateSubjectInput, StudentClassAssignmentInput } from "./adminSchema";
 import { hashPassword } from "../../auth/password";
 
 //DATABASE INTERACTIONS AND CUSTOM FUNCTIONS
@@ -36,13 +36,20 @@ export async function AssignSubject(data: AssignSubjectInput & { adminId: number
     })
 }
 
+export async function studentClassAssignment(data: StudentClassAssignmentInput) {
+    return await prisma.classAssignment.create({
+        data: data
+    })
+}
+
 export async function createStudent(data: CreateStudentInput & { adminId: number }) {
     const password = await hashPassword(data.password)
 
     return await prisma.student.create({
         data: {
             ...data,
-            password: password
+            password: password,
+
         }
     })
 }
