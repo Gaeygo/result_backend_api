@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma";
-import { CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, CreateSubjectInput, StudentClassAssignmentInput } from "./adminSchema";
+import { CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, CreateSubjectInput, StudentClassAssignmentInput, courseEnrollmentInput } from "./adminSchema";
 import { hashPassword } from "../../auth/password";
 
 //DATABASE INTERACTIONS AND CUSTOM FUNCTIONS
@@ -36,13 +36,29 @@ export async function AssignSubject(data: AssignSubjectInput & { adminId: number
     })
 }
 
-export async function studentClassAssignment(data: StudentClassAssignmentInput) {
+export async function studentClassAssignment(data: StudentClassAssignmentInput & { adminId: number }) {
     return await prisma.classAssignment.create({
         data: data
     })
 }
 
-export async function createStudent(data: CreateStudentInput & { adminId: number }) {
+type SafeStudentType = Omit<CreateStudentInput, "classId" | "sessionId">
+
+export async function checkIfStudentExists(data: SafeStudentType) {
+    const student = await prisma.student.findUnique({
+        where: {
+            fullName: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                phonenumber: data.phonenumber,
+                motherMaidenName: data.motherMaidenName
+            }
+        }
+    })
+
+}
+
+export async function createStudent(data: SafeStudentType & { adminId: number }) {
     const password = await hashPassword(data.password)
 
     return await prisma.student.create({
@@ -59,5 +75,11 @@ export async function createClass(data: CreateClassInput & { adminId: number }) 
         data: {
             ...data
         }
+    })
+}
+
+export async function studentCourseEnrollment(data: courseEnrollmentInput & { adminId: number }) {
+    return await prisma.courseEnrollment.create({
+        data: data
     })
 }

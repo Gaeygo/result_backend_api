@@ -28,6 +28,11 @@ export const errorHandler = (error: HttpException | PrismaClientKnownRequestErro
         logger.error(error, message)
     } else if (error instanceof PrismaClientKnownRequestError) {
         handlePrismaError(error)
+        reply.status(400).send({
+            status: error.code,
+            statusCode: 400,
+            message: error.message,
+        });
 
     }
 
@@ -51,7 +56,7 @@ export const errorHandler = (error: HttpException | PrismaClientKnownRequestErro
 
 
 
-    logger.error(error)
+    // logger.error(error)
 }
 
 
@@ -60,9 +65,12 @@ export const errorHandler = (error: HttpException | PrismaClientKnownRequestErro
 
 
 function handlePrismaError(error: PrismaClientKnownRequestError) {
-    logger.error(error)
-    new HttpException(400, error.message, error.code);
+
+    return new HttpException(400, error.message, error.code);
+
+    // logger.error(error)
 }
 
 
 
+//FIXME: unique constraint handling

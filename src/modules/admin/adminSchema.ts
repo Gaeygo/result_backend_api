@@ -57,7 +57,10 @@ const studentCreateSchema = z.object({
     password: z.string(),
     active: z.boolean(),
     classId: z.number(),
-    phonenumber: z.string()
+    phonenumber: z.string(),
+    sessionId: z.number(),
+    motherMaidenName: z.string(),
+    classToBeAdmittedTo: z.union([gradeLevelEnum, NGgradeEnum])
 
 })
 

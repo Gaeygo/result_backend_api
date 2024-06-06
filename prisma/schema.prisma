@@ -147,18 +147,20 @@ enum AdminRole {
 ////////// PREVENT INSERT TO ANY GRADE AFTER A SESSION ELASPES OR AFTER A TERM ELASPES
 /////////
 model Admin {
-  id        Int               @id @unique @default(autoincrement())
-  name      String            @unique
-  password  String
-  subjects  SubjectAssigned[] // Admin can create multiple subjects
-  classes   Class[]
-  role      AdminRole         @default(ADMIN)
-  disabled  Boolean           @default(true)
-  teachers  Teacher[]
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  Subject   Subject[]
-  Session   Session[]
+  id               Int                @id @unique @default(autoincrement())
+  name             String             @unique
+  password         String
+  subjects         SubjectAssigned[] // Admin can create multiple subjects
+  classes          Class[]
+  role             AdminRole          @default(ADMIN)
+  disabled         Boolean            @default(true)
+  teachers         Teacher[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Subject          Subject[]
+  Session          Session[]
+  CourseEnrollment CourseEnrollment[]
+  ClassAssignment  ClassAssignment[]
 }
 
 model Session {
@@ -185,19 +187,22 @@ model Term {
 }
 
 model Student {
-  id                Int                @id @unique @default(autoincrement())
-  firstName         String
-  lastName          String
-  middleName        String?
-  phonenumber       String             @unique
-  password          String
-  courseEnrollments CourseEnrollment[] // A student can register for multiple subjects
-  classId           Int
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  active            Boolean
-  sessions          Session[]
-  ClassAssignment   ClassAssignment[]
+  id                  Int                @id @unique @default(autoincrement())
+  firstName           String
+  lastName            String
+  middleName          String?
+  motherMaidenName    String
+  classToBeAdmittedTo ClassLevel
+  phonenumber         String             @unique
+  password            String
+  courseEnrollments   CourseEnrollment[] // A student can register for multiple subjects
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  active              Boolean
+  sessions            Session[]
+  ClassAssignment     ClassAssignment[]
+
+  @@unique([firstName, lastName, motherMaidenName, phonenumber], name: "fullName")
 }
 
 //add subject option inlude subject name and subject/class level
@@ -240,14 +245,12 @@ model SubjectAssigned {
   subjectId         Int
 }
 
-
-
 model Class {
   id              Int               @id @default(autoincrement())
   name            String
   admin           Admin             @relation(fields: [adminId], references: [id])
   adminId         Int
-  classTeacher         Teacher?          @relation(fields: [teacherId], references: [id])
+  classTeacher    Teacher?          @relation(fields: [teacherId], references: [id])
   teacherId       Int?              @unique
   subjects        SubjectAssigned[]
   active          Boolean
@@ -255,8 +258,6 @@ model Class {
   // CourseEnrollment CourseEnrollment[]
   ClassAssignment ClassAssignment[]
 }
-
-
 
 model CourseEnrollment {
   id                String          @id @unique @default(uuid())
@@ -269,6 +270,8 @@ model CourseEnrollment {
   term              Term            @relation(fields: [termId], references: [id])
   termId            Int
   grades            Grade[]
+  admin             Admin           @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
+  adminId           Int
   // class     Class           @relation(fields: [classId], references: [id])
   // classId   Int
   ClassAssignment   ClassAssignment @relation(fields: [classAssignmentId], references: [id])
@@ -284,9 +287,10 @@ model ClassAssignment {
   session          Session            @relation(fields: [sessionId], references: [id])
   sessionId        Int
   assignedAt       DateTime           @default(now())
+  admin            Admin              @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
+  adminId          Int
   CourseEnrollment CourseEnrollment[]
 }
-
 
 model Grade {
   id                 String           @id @default(uuid())

@@ -1,9 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
 import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, courseEnrollmentInput, CreateSubjectInput } from "./adminSchema";
-import { createClass, createStudent, AssignSubject, createTeacher, createSubject } from "./admin.service";
+import { createClass, createStudent, AssignSubject, createTeacher, createSubject, studentClassAssignment, studentCourseEnrollment } from "./admin.service";
 import { hashPassword } from "../../auth/password";
 import { generateDatePairs } from "../../utils/GenerateObjects";
+import HttpException from "../../schema/error";
 
 
 export const createAdmin = async (request: FastifyRequest<{
@@ -168,7 +169,12 @@ export const registerStudent = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const student = await createStudent({ ...request.body, adminId: +request.user.id })
-        response.send({ message: "Student registered", status: 201 })
+        if (student) {
+            const studentAssignment = await studentClassAssignment({ studentId: student.id, classId: request.body.classId, sessionId: request.body.sessionId, adminId: +request.user.id })
+
+            response.send({ message: "Student registered", status: 201 })
+        }
+        throw new HttpException(400, "student not created")
 
     } catch (error) {
         throw error
@@ -176,14 +182,19 @@ export const registerStudent = async (request: FastifyRequest<{
 }
 
 // first enroll in a class, then run course enrollement
-export const studentCourseEnrollment = async (request: FastifyRequest<{
+//FIXME: ADD STUDENT COURSE ENROLLEMENT TO SERVICES
+export const studentCourseEnrollmentController = async (request: FastifyRequest<{
     Body: courseEnrollmentInput
 }>, response: FastifyReply) => {
-    const courseEnrolled = await prisma.courseEnrollment.create({
-        data: request.body
-    })
+    try {
+        const courseEnrolled = await studentCourseEnrollment({ ...request.body, adminId: +request.user.id })
+        response.status(201).send({ message: "Student enrolled into certain course", status: 200 })
+
+    } catch (error) {
+
+    }
 
 }
 
 
-//TODO:
+//TODO: STUDENT CLASS REGISTRATION
