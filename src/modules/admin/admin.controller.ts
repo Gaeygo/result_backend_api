@@ -110,6 +110,38 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
 
 }
 
+//set current session
+export const addFirstSession = async (request: FastifyRequest<{
+    Body: {
+        currentSession: string
+    }
+}>, response: FastifyReply) => {
+    //TODO:
+    //check if session exists and if date has elapsed
+    try {
+        if (!request.body.currentSession || !process.env.CURRENT_SESSION) throw new HttpException(400, "details for session initialisation not provided")
+        const currentSessionInit = await prisma.constant.create({
+            data: {
+                key: process.env.CURRENT_SESSION,
+                value: request.body.currentSession,
+                adminId: +request.user.id
+            }
+        })
+        if (currentSessionInit) {
+            response.status(200).send({ message: "Current session initialised", status: 200 })
+        }
+    } catch (error) {
+        throw error
+    }
+}
+
+export const changeSession = async (request: FastifyRequest, response: FastifyReply) => {
+//first get session
+//then confirm date hasn't yet elapsed
+//check if active, then add
+//to disable or remove make initial session inactive and then remove
+} 
+
 //Send email for approval of creation || send details to phone number
 
 //creation of Teachers
@@ -181,20 +213,6 @@ export const registerStudent = async (request: FastifyRequest<{
     }
 }
 
-// first enroll in a class, then run course enrollement
-//FIXME: ADD STUDENT COURSE ENROLLEMENT TO SERVICES
-export const studentCourseEnrollmentController = async (request: FastifyRequest<{
-    Body: courseEnrollmentInput
-}>, response: FastifyReply) => {
-    try {
-        const courseEnrolled = await studentCourseEnrollment({ ...request.body, adminId: +request.user.id })
-        response.status(201).send({ message: "Student enrolled into certain course", status: 200 })
-
-    } catch (error) {
-
-    }
-
-}
 
 
 //TODO: STUDENT CLASS REGISTRATION

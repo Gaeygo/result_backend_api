@@ -161,6 +161,7 @@ model Admin {
   Session          Session[]
   CourseEnrollment CourseEnrollment[]
   ClassAssignment  ClassAssignment[]
+  Constant         Constant[]
 }
 
 model Session {
@@ -199,8 +200,11 @@ model Student {
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   active              Boolean
-  sessions            Session[]
-  ClassAssignment     ClassAssignment[]
+  CurrentClass        Class?             @relation(fields: [classId], references: [id])
+  classId             Int?
+
+  sessions        Session[]
+  ClassAssignment ClassAssignment[]
 
   @@unique([firstName, lastName, motherMaidenName, phonenumber], name: "fullName")
 }
@@ -257,6 +261,7 @@ model Class {
   classLevel      ClassLevel
   // CourseEnrollment CourseEnrollment[]
   ClassAssignment ClassAssignment[]
+  Student         Student[]
 }
 
 model CourseEnrollment {
@@ -336,3 +341,15 @@ model Teacher {
 //   class    Class     @relation(fields: [classId], references: [id])
 //   classId  Int
 // }
+
+//storage of constants
+//store keys in dotenv file
+model Constant {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  admin     Admin    @relation(fields: [adminId], references: [id])
+  adminId   Int
+}

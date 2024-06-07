@@ -28,7 +28,8 @@ declare global {
 	namespace NodeJS {
 		interface ProcessEnv {
 			JWTTOKEN: string,
-			DATABASE_URL: string
+			DATABASE_URL: string,
+			CURRENT_SESSION: string
 
 		}
 	}
