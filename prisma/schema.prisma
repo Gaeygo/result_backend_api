@@ -167,12 +167,18 @@ model Admin {
 model Session {
   id                 Int                @id @default(autoincrement())
   academicYear       String // E.g., "2018/2019", "2020/2021"
+  //start date
+  //end date
+  active             Boolean            @default(true)
+  startDate          DateTime
+  closeDate          DateTime
   registeredStudents Student[]
   terms              Term[]
   CourseEnrollment   CourseEnrollment[]
   Admin              Admin              @relation(fields: [adminId], references: [id])
   adminId            Int
   ClassAssignment    ClassAssignment[]
+  createdAt          DateTime           @default(now())
 }
 
 model Term {
@@ -185,6 +191,7 @@ model Term {
   openDate    DateTime
   closedDate  DateTime
   inTerm      Boolean            @default(false)
+  createdAt   DateTime           @default(now())
 }
 
 model Student {
@@ -218,6 +225,7 @@ model Subject {
   SubjectAssigned    SubjectAssigned[]
   admin              Admin             @relation(fields: [adminId], references: [id])
   adminId            Int
+  createdAt          DateTime          @default(now())
 }
 
 enum ClassLevel {
@@ -247,6 +255,7 @@ model SubjectAssigned {
   courseEnrollments CourseEnrollment[]
   isElective        Boolean            @default(false)
   subjectId         Int
+  createdAt         DateTime           @default(now())
 }
 
 model Class {
@@ -262,6 +271,7 @@ model Class {
   // CourseEnrollment CourseEnrollment[]
   ClassAssignment ClassAssignment[]
   Student         Student[]
+  createdAt       DateTime          @default(now())
 }
 
 model CourseEnrollment {
@@ -281,6 +291,7 @@ model CourseEnrollment {
   // classId   Int
   ClassAssignment   ClassAssignment @relation(fields: [classAssignmentId], references: [id])
   classAssignmentId Int
+  createdAt         DateTime        @default(now())
 }
 
 model ClassAssignment {
@@ -295,6 +306,7 @@ model ClassAssignment {
   admin            Admin              @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
   adminId          Int
   CourseEnrollment CourseEnrollment[]
+  createdAt        DateTime           @default(now())
 }
 
 model Grade {

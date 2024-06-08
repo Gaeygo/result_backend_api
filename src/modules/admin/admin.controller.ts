@@ -61,14 +61,19 @@ export const suspendAdmin = async (request: FastifyRequest<{ Body: AdminSuspendB
 //when a session is created 3 terms should automatically created
 export const createAndInitialiseSession = async (request: FastifyRequest<{
     Body: {
-        academicYear: string
+        academicYear: string,
+        startDate: Date,
+        closeDate: Date
     }
 }>, response: FastifyReply) => {
     try {
         const session = await prisma.session.create({
             data: {
                 academicYear: request.body.academicYear,
-                adminId: +request.user.id
+                adminId: +request.user.id,
+                startDate: request.body.startDate,
+                closeDate: request.body.closeDate
+                
             }
         })
         if (session) {

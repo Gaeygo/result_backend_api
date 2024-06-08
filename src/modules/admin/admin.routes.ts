@@ -25,7 +25,15 @@ export async function AdminRoutes(server: FastifyInstance) {
             body: CreateSessionSchema
         },
 
-        preHandler: [authVerify<{ academicYear: string }, {}>, authMiddleware<{ academicYear: string }, {}>([ROLEENUM.SUPERADMIN])],
+        preHandler: [authVerify<{
+            academicYear: string,
+            startDate: Date,
+            closeDate: Date
+        }, {}>, authMiddleware<{
+            academicYear: string,
+            startDate: Date,
+            closeDate: Date
+        }, {}>([ROLEENUM.SUPERADMIN])],
 
     }, createAndInitialiseSession)
 
