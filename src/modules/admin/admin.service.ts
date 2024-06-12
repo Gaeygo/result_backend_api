@@ -83,3 +83,38 @@ export async function studentCourseEnrollment(data: courseEnrollmentInput & { ad
         data: data
     })
 }
+
+
+
+/////GET CURRENT SESSION
+export async function getCurrentSessionFromConstant(constantName: string) {
+    const sessionId = await prisma.constant.findUnique({
+        where: {
+            key: constantName
+        }
+    })
+
+    if (sessionId) {
+
+
+        const currentSession = await prisma.session.findUnique({
+            where: {
+                id: +sessionId.value
+            }
+        })
+
+        return currentSession
+    }
+
+}
+
+
+export async function getCurrentSession(id: string) {
+
+    return await prisma.session.findUnique({
+        where: {
+            id: +id
+        }
+    })
+
+}

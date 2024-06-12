@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
 import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, courseEnrollmentInput, CreateSubjectInput } from "./adminSchema";
-import { createClass, createStudent, AssignSubject, createTeacher, createSubject, studentClassAssignment, studentCourseEnrollment } from "./admin.service";
+import { createClass, createStudent, AssignSubject, createTeacher, createSubject, studentClassAssignment, studentCourseEnrollment, getCurrentSession, getCurrentSessionFromConstant } from "./admin.service";
 import { hashPassword } from "../../auth/password";
 import { generateDatePairs } from "../../utils/GenerateObjects";
 import HttpException from "../../schema/error";
@@ -73,7 +73,7 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
                 adminId: +request.user.id,
                 startDate: request.body.startDate,
                 closeDate: request.body.closeDate
-                
+
             }
         })
         if (session) {
@@ -124,7 +124,19 @@ export const addFirstSession = async (request: FastifyRequest<{
     //TODO:
     //check if session exists and if date has elapsed
     try {
+        const session = await getCurrentSessionFromConstant(process.env.CURRENT_SESSION)
+
+
+        if (!session) throw new HttpException(400, "Session does not exist")
+
+        if (Date.now() > session.closeDate.getMilliseconds()) throw new HttpException(400, "Session time has elapsed can't be assigned")
+
         if (!request.body.currentSession || !process.env.CURRENT_SESSION) throw new HttpException(400, "details for session initialisation not provided")
+
+        const sessionCheck = await getCurrentSession(request.body.currentSession)
+
+        if (!sessionCheck) throw new HttpException(400, "Session does not exist")
+
         const currentSessionInit = await prisma.constant.create({
             data: {
                 key: process.env.CURRENT_SESSION,
@@ -140,12 +152,45 @@ export const addFirstSession = async (request: FastifyRequest<{
     }
 }
 
-export const changeSession = async (request: FastifyRequest, response: FastifyReply) => {
-//first get session
-//then confirm date hasn't yet elapsed
-//check if active, then add
-//to disable or remove make initial session inactive and then remove
-} 
+export const changeSession = async (request: FastifyRequest<{
+    Body: {
+        newSession: string
+    }
+}>, response: FastifyReply) => {
+    try {
+        const currentSession = await getCurrentSessionFromConstant(process.env.CURRENT_SESSION)
+
+        if (!currentSession) throw new HttpException(400, "session does not exist")
+
+        if (currentSession.closeDate.getMilliseconds() < Date.now()) throw new HttpException(400, "Session can't be altered due to current session closed date to elasped")
+
+        const sessionCheck = await getCurrentSession(request.body.newSession)
+
+        if (!sessionCheck) throw new HttpException(400, "Session does not exist")
+
+
+        const assignSession = await prisma.constant.update({
+            where: {
+                key: process.env.CURRENT_SESSION
+            },
+            data: {
+                value: request.body.newSession
+            }
+        })
+
+        response.status(200).send({message: "Current Session value has been Updated", status: 200})
+
+    } catch (error) {
+        throw error
+    }
+
+
+
+    //first get session
+    //then confirm date hasn't yet elapsed
+    //check if active, then add
+    //to disable or remove make initial session inactive and then remove
+}
 
 //Send email for approval of creation || send details to phone number
 
