@@ -3,6 +3,7 @@ import { createAdmin, registerClass, registerStudent, registerAndAssignSubject, 
 import { $ref, AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, ROLEENUM, CreateSubjectInput } from "./adminSchema"
 import { authVerify, authMiddleware } from "../../auth/authMiddleware"
 import { CreateSessionSchema } from "../../schema/schema"
+import { } from "../admin/studentManagement"
 
 export async function AdminRoutes(server: FastifyInstance) {
     server.post("/createAdmin", {

@@ -1,6 +1,7 @@
 import prisma from "../../lib/prisma";
-import { CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, CreateSubjectInput, StudentClassAssignmentInput, courseEnrollmentInput } from "./adminSchema";
+import { CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, CreateSubjectInput, StudentClassAssignmentInput, courseEnrollmentInput, studentCompulsorySubjectAssignment } from "./adminSchema";
 import { hashPassword } from "../../auth/password";
+import HttpException from "../../schema/error";
 
 //DATABASE INTERACTIONS AND CUSTOM FUNCTIONS
 export async function createTeacher(data: CreateTeacherInput & { adminId: number }) {
@@ -28,6 +29,8 @@ export async function createSubject(data: CreateSubjectInput & { adminId: number
     })
 }
 
+
+
 export async function AssignSubject(data: AssignSubjectInput & { adminId: number }) {
     return await prisma.subjectAssigned.create({
         data: data
@@ -41,6 +44,8 @@ export async function studentClassAssignment(data: StudentClassAssignmentInput &
         data: data
     })
 }
+
+
 
 type SafeStudentType = Omit<CreateStudentInput, "classId" | "sessionId">
 
@@ -85,6 +90,25 @@ export async function studentCourseEnrollment(data: courseEnrollmentInput & { ad
 }
 
 
+export async function studentCompulsoryCourseEnrollment(data: studentCompulsorySubjectAssignment & { classId: number, adminId: number }) {
+    const subjects = await prisma.class.findUnique({
+        where: {
+            id: data.classId
+        },
+        select: {
+            subjects: true
+        }
+    })
+
+    if (!subjects) throw new HttpException(500, "Subjects can't be fetched")
+
+    const promises = await Promise.all(subjects.subjects.map(subject => studentCourseEnrollment({ ...data, subjectId: subject.id })))
+
+    return promises
+
+
+
+}
 
 /////GET CURRENT SESSION
 export async function getCurrentSessionFromConstant(constantName: string) {
