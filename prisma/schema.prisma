@@ -200,7 +200,7 @@ model Student {
   lastName            String
   middleName          String?
   motherMaidenName    String
-  classToBeAdmittedTo ClassLevel
+  classToBeAssignedTo ClassLevel
   phonenumber         String             @unique
   password            String
   courseEnrollments   CourseEnrollment[] // A student can register for multiple subjects

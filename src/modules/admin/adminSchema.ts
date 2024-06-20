@@ -26,6 +26,25 @@ export type ROLESENUM = {
     STUDENT: "STUDENT"
 }
 
+// type StudentClassPlacementInput = {
+//     studentId: string,
+//     action: classAction,
+//     //fetch current class from db
+//     //fucntion getStudentCurrentClassLevel
+//     //you create a new classAssignment to new class
+
+// }
+
+const classAction = z.enum(['PROMOTE', 'DEMOTE', 'RETAIN'])
+
+export type ClassActionEnum = z.infer<typeof classAction>
+
+
+const studentClassPlacementSchema = z.object({
+    studentId: z.string(),
+    action: classAction
+})
+
 
 
 const adminCreateSchema = z.object({
@@ -60,7 +79,7 @@ const studentCreateSchema = z.object({
     phonenumber: z.string(),
     sessionId: z.number(),
     motherMaidenName: z.string(),
-    classToBeAdmittedTo: z.union([gradeLevelEnum, NGgradeEnum])
+    classToBeAssignedTo: z.union([gradeLevelEnum, NGgradeEnum])
 
 })
 
@@ -129,8 +148,9 @@ export type StudentClassAssignmentInput = z.infer<typeof studentClassAssignmentS
 
 export type studentCompulsorySubjectAssignment = z.infer<typeof courseCumplsoryEnrollmentSchema>
 //Omit<courseEnrollmentInput, "subjectId">
-
+export type  StudentClassPlacementInput = z.infer<typeof studentClassPlacementSchema>
 
 export const { schemas: adminSchema, $ref } = buildJsonSchemas({
     adminCreateSchema, adminSuspendSchema, teacherCreateSchema, studentClassAssignmentSchema, assignSubjectInputSchema, studentCreateSchema, createClassInput, loginSchema, createSubjectInputSchema
-, courseCumplsoryEnrollmentSchema}, { $id: 'Admin' })
+    , courseCumplsoryEnrollmentSchema, studentClassPlacementSchema
+}, { $id: 'Admin' })

@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
-import { StudentClassAssignmentInput, courseEnrollmentInput, studentCompulsorySubjectAssignment } from "./adminSchema";
+import { StudentClassAssignmentInput, StudentClassPlacementInput, courseEnrollmentInput, studentCompulsorySubjectAssignment } from "./adminSchema";
 import { studentClassAssignment, studentCompulsoryCourseEnrollment, studentCourseEnrollment } from "./admin.service";
 import HttpException from "../../schema/error";
 
@@ -84,9 +84,46 @@ export const studentClassAssignmentController = async (request: FastifyRequest<{
 
 }
 
-//TODO:
+//TODO:STORE CLASS FORMAT IN .ENV FILE
 //promotion, demotion and rentention
-const promotion = (request: FastifyRequest, response: FastifyReply) => {
+//["GRADE7", "GRADE8", "GRADE9", "GRADE10", "GRADE11", "GRADE12"]
+//["JSS1", "JSS2", "JSS3"]
+//["SS1", "SS2", "SS3"]
+
+//class to be assigned to 
+
+
+const studentClassManagement = (request: FastifyRequest<{
+    Body: StudentClassPlacementInput
+}>, response: FastifyReply) => {
+
+
+    const nigeriaClassLevels = {
+        junior: ['JSS1', 'JSS2', 'JSS3'] as const,
+        senior: ['SS1', 'SS2', 'SS3'] as const,
+    };
+
+
+
+    switch (request.body.action) {
+        case "PROMOTE":
+
+
+            break;
+        case "DEMOTE":
+
+            break;
+        case "RETAIN":
+
+
+            break;
+    }
+    //get student id
+    //get current class
+    // get action to perform promotion|demotion|retention
+    // only for new session
+    // when 3rd term/ session has ended
+    // 
 
     // to get latest registration .length on the classassignment array then -1 to get current one
 }
