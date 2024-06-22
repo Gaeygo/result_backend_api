@@ -235,12 +235,7 @@ enum ClassLevel {
   SS1
   SS2
   SS3
-  GRADE7
-  GRADE8
-  GRADE9
-  GRADE10
-  GRADE11
-  GRADE12
+ 
 }
 
 model SubjectAssigned {

@@ -12,7 +12,6 @@ export enum ROLEENUM {
 }
 const roleZodEnum = z.enum(["SUPERADMIN", "ADMIN", "TEACHER", "STUDENT"])
 
-const gradeLevelEnum = z.enum(["GRADE7", "GRADE8", "GRADE9", "GRADE10", "GRADE11", "GRADE12"])
 const NGgradeEnum = z.enum(["JSS1", "JSS2", "JSS3", "SS1", "SS2", "SS3"])
 
 export type ZODROLEENUM = z.infer<typeof roleZodEnum>
@@ -79,7 +78,7 @@ const studentCreateSchema = z.object({
     phonenumber: z.string(),
     sessionId: z.number(),
     motherMaidenName: z.string(),
-    classToBeAssignedTo: z.union([gradeLevelEnum, NGgradeEnum])
+    classToBeAssignedTo:  NGgradeEnum
 
 })
 
@@ -87,7 +86,7 @@ const createClassInput = z.object({
     name: z.string(),
     // teacherId: z.number().optional(),
     active: z.boolean(),
-    classLevel: z.union([gradeLevelEnum, NGgradeEnum])
+    classLevel: NGgradeEnum
 
 })
 

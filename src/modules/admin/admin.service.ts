@@ -142,3 +142,23 @@ export async function getCurrentSession(id: string) {
     })
 
 }
+
+
+export async function getCurrentClass(studentId: number) {
+    return await prisma.student.findUnique({
+        where: {
+            id: studentId
+        },
+        select: {
+            classId: true,
+            ClassAssignment: true,
+            CurrentClass: {
+                select: {
+                    classLevel: true
+                }
+            }
+
+        }
+    })
+
+}

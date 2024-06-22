@@ -1,8 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
 import { StudentClassAssignmentInput, StudentClassPlacementInput, courseEnrollmentInput, studentCompulsorySubjectAssignment } from "./adminSchema";
-import { studentClassAssignment, studentCompulsoryCourseEnrollment, studentCourseEnrollment } from "./admin.service";
+import { getCurrentClass, studentClassAssignment, studentCompulsoryCourseEnrollment, studentCourseEnrollment } from "./admin.service";
 import HttpException from "../../schema/error";
+import { ClassLevel } from "@prisma/client";
 
 
 
@@ -91,33 +92,29 @@ export const studentClassAssignmentController = async (request: FastifyRequest<{
 //["SS1", "SS2", "SS3"]
 
 //class to be assigned to 
+//then next session class placement is done
+////or/////
+//do everything in a single go
+////or///
+//have a badge that says promotion/retention/demotion and automatically permform that action in the next session
 
 
-const studentClassManagement = (request: FastifyRequest<{
+const studentClassManagement = async (request: FastifyRequest<{
     Body: StudentClassPlacementInput
 }>, response: FastifyReply) => {
 
+    const studentNewLevel = await manageStudentLevelLogic(request.body)
 
-    const nigeriaClassLevels = {
-        junior: ['JSS1', 'JSS2', 'JSS3'] as const,
-        senior: ['SS1', 'SS2', 'SS3'] as const,
-    };
+    const alterStudentPotentialClassField = () => {}
 
+    //remove student from previous class and assign to new class
+    //alter student tobeassigedclass field
 
-
-    switch (request.body.action) {
-        case "PROMOTE":
+    response.status(200).send({ message: "succes", status: 200 })
 
 
-            break;
-        case "DEMOTE":
-
-            break;
-        case "RETAIN":
 
 
-            break;
-    }
     //get student id
     //get current class
     // get action to perform promotion|demotion|retention
@@ -126,4 +123,68 @@ const studentClassManagement = (request: FastifyRequest<{
     // 
 
     // to get latest registration .length on the classassignment array then -1 to get current one
+}
+const junior = ['JSS1', 'JSS2', 'JSS3'] as const;
+const senior = ['SS1', 'SS2', 'SS3'] as const;
+
+// export type ClassLevel = (typeof junior)[number] | (typeof senior)[number];
+
+
+
+
+const manageStudentLevelLogic = async (data: StudentClassPlacementInput): Promise<ClassLevel> => {
+    try {
+        const studentCurrentClassData = await getCurrentClass(+data.studentId)
+        if (!studentCurrentClassData?.CurrentClass) throw new HttpException(400, "invalid class request")
+        const currentLevel = studentCurrentClassData.CurrentClass.classLevel
+        const { level, index } = determineClassLevelWithIndex(currentLevel);
+
+        switch (data.action) {
+            case 'PROMOTE':
+                if (level === 'junior' && index < 2) {
+                    return junior[index + 1];
+                } else if (level === 'junior' && index === 2) {
+                    return senior[0];
+                } else if (level === 'senior' && index < 2) {
+                    return senior[index + 1];
+                } else {
+                    return currentLevel; // SS3 can't be promoted
+                }
+
+            case 'DEMOTE':
+                if (level === 'junior' && index > 0) {
+                    return junior[index - 1];
+                } else if (level === 'senior' && index > 0) {
+                    return senior[index - 1];
+                } else if (level === 'senior' && index === 0) {
+                    return junior[2];
+                } else {
+                    return currentLevel; // JSS1 can't be demoted
+                }
+
+            case 'RETAIN':
+                return currentLevel;
+
+            default:
+                throw new HttpException(400, 'Invalid action');
+        }
+    } catch (error) {
+        throw error
+    }
+
+
+}
+
+function determineClassLevelWithIndex(input: ClassLevel): { level: 'junior' | 'senior', index: number } {
+    const juniorIndex = junior.indexOf(input as any);
+    if (juniorIndex !== -1) {
+        return { level: 'junior', index: juniorIndex };
+    }
+
+    const seniorIndex = senior.indexOf(input as any);
+    if (seniorIndex !== -1) {
+        return { level: 'senior', index: seniorIndex };
+    }
+
+    throw new HttpException(400, 'Invalid input');
 }
