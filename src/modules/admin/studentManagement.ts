@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
-import { StudentClassAssignmentInput, StudentClassPlacementInput, courseEnrollmentInput, studentCompulsorySubjectAssignment } from "./adminSchema";
+import { ClassActionEnum, StudentClassAssignmentInput, StudentClassPlacementInput, courseEnrollmentInput, studentCompulsorySubjectAssignment } from "./adminSchema";
 import { getCurrentClass, studentClassAssignment, studentCompulsoryCourseEnrollment, studentCourseEnrollment } from "./admin.service";
 import HttpException from "../../schema/error";
 import { ClassLevel } from "@prisma/client";
@@ -52,7 +52,8 @@ export const studentClassAssignmentController = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
 
     try {
-
+ ////from frontend only classes that belong to classToBeAssignedTo will be seen to assigned a class to them////
+ ////have to verify the "action"///// so input doesn't violate it
 
         const classAssigned = await studentClassAssignment({ ...request.body as StudentClassAssignmentInput, adminId: +request.user.id })
         if (classAssigned) {
@@ -102,27 +103,27 @@ export const studentClassAssignmentController = async (request: FastifyRequest<{
 const studentClassManagement = async (request: FastifyRequest<{
     Body: StudentClassPlacementInput
 }>, response: FastifyReply) => {
+    //make it only available after session 
+    //but add field to database that shows if the student gets retain/demote/promote and that will be done be head class teacher
+
+    // when 3rd term/ session has ended
+
+    // 
+
+    // to get latest registration .length on the classassignment array then -1 to get current one
 
     const studentNewLevel = await manageStudentLevelLogic(request.body)
 
-    const alterStudentPotentialClassField = () => {}
+    const studentNewLevelAndActionSaved = await alterStudentEndOfSessionField(+request.body.studentId, studentNewLevel, request.body.action)
+
 
     //remove student from previous class and assign to new class
     //alter student tobeassigedclass field
 
-    response.status(200).send({ message: "succes", status: 200 })
+    response.status(200).send({ message: "success, new stdent class level is saved to database and action is saved", status: 200 })
 
 
 
-
-    //get student id
-    //get current class
-    // get action to perform promotion|demotion|retention
-    // only for new session
-    // when 3rd term/ session has ended
-    // 
-
-    // to get latest registration .length on the classassignment array then -1 to get current one
 }
 const junior = ['JSS1', 'JSS2', 'JSS3'] as const;
 const senior = ['SS1', 'SS2', 'SS3'] as const;
@@ -175,6 +176,23 @@ const manageStudentLevelLogic = async (data: StudentClassPlacementInput): Promis
 
 }
 
+const alterStudentEndOfSessionField = async (studentId: number, classToBeAssignedTo: ClassLevel, endOfSessionAction: ClassActionEnum) => {
+    return await prisma.student.update({
+        where: {
+            id: studentId,
+        },
+        data: {
+            classToBeAssignedTo,
+            endOfSessionAction
+        }
+    })
+}
+
+//assign new class to student 
+//draw compare class to classtobeassignedto field and verify that the initial action chosen is what is being done PROMOTE/DEMOTE...
+//route studentClassAssignmentController
+
+
 function determineClassLevelWithIndex(input: ClassLevel): { level: 'junior' | 'senior', index: number } {
     const juniorIndex = junior.indexOf(input as any);
     if (juniorIndex !== -1) {
@@ -188,3 +206,5 @@ function determineClassLevelWithIndex(input: ClassLevel): { level: 'junior' | 's
 
     throw new HttpException(400, 'Invalid input');
 }
+
+

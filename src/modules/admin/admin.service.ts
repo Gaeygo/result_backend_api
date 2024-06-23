@@ -110,6 +110,26 @@ export async function studentCompulsoryCourseEnrollment(data: studentCompulsoryS
 
 }
 
+
+export async function getCurrentClass(studentId: number) {
+    return await prisma.student.findUnique({
+        where: {
+            id: studentId
+        },
+        select: {
+            classId: true,
+            ClassAssignment: true,
+            CurrentClass: {
+                select: {
+                    classLevel: true
+                }
+            }
+
+        }
+    })
+
+}
+
 /////GET CURRENT SESSION
 export async function getCurrentSessionFromConstant(constantName: string) {
     const sessionId = await prisma.constant.findUnique({
@@ -133,7 +153,7 @@ export async function getCurrentSessionFromConstant(constantName: string) {
 }
 
 
-export async function getCurrentSession(id: string) {
+export async function getSession(id: number) {
 
     return await prisma.session.findUnique({
         where: {
@@ -143,22 +163,52 @@ export async function getCurrentSession(id: string) {
 
 }
 
+export const addSessionAsConstant = async (
+    newSessionId:  number,
+    currentSessionKey: string,
+    adminId: number
+) => {
+    // Check if the new session exists
+    const sessionCheck = await getSession(newSessionId);
+    if (!sessionCheck) {
+        throw new HttpException(400, "Session does not exist");
+    }
 
-export async function getCurrentClass(studentId: number) {
-    return await prisma.student.findUnique({
-        where: {
-            id: studentId
-        },
-        select: {
-            classId: true,
-            ClassAssignment: true,
-            CurrentClass: {
-                select: {
-                    classLevel: true
-                }
+    // Check if the new session's close date has elapsed
+    if (new Date(sessionCheck.closeDate).getTime() < Date.now()) {
+        throw new HttpException(400, "New session's close date has already elapsed");
+    }
+
+    const currentSession = await getCurrentSessionFromConstant(currentSessionKey);
+
+    // if(currentSession && new Date(currentSession?.closeDate).getTime() > new Date(sessionCheck.closeDate).getTime()) throw new HttpException(400, "Current session is yet to elasp")
+
+    if (!currentSession) {
+        // Create a new constant if no current session exists
+        const currentSessionInit = await prisma.constant.create({
+            data: {
+                key: currentSessionKey,
+                value: newSessionId.toString(),
+                adminId: adminId
             }
-
+        });
+        return currentSessionInit;
+    } else {
+        // Check if the current session's close date has elapsed
+        if (new Date(currentSession.closeDate).getTime() > Date.now()) {
+            throw new HttpException(400, "Cannot change current session before its close date");
         }
-    })
 
-}
+        // Update the existing constant
+        const assignSession = await prisma.constant.update({
+            where: {
+                key: currentSessionKey
+            },
+            data: {
+                value: newSessionId.toString()
+            }
+        });
+        return assignSession;
+    }
+};
+

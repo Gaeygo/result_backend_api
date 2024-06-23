@@ -182,16 +182,22 @@ model Session {
 }
 
 model Term {
-  id          Int                @id @default(autoincrement())
-  termName    String // E.g., "Term 1", "Term 2", "Term 3"
-  session     Session            @relation(fields: [sessionId], references: [id])
-  sessionId   Int
-  results     Grade[]
+  id         Int      @id @default(autoincrement())
+  termName   String // E.g., "Term 1", "Term 2", "Term 3"
+  session    Session  @relation(fields: [sessionId], references: [id])
+  sessionId  Int
+  results    Grade[]
   // enrollments CourseEnrollment[]
-  openDate    DateTime
-  closedDate  DateTime
-  inTerm      Boolean            @default(false)
-  createdAt   DateTime           @default(now())
+  openDate   DateTime
+  closedDate DateTime
+  inTerm     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+enum EndOfSessionEnum {
+  PROMOTE
+  RETAIN
+  DEMOTE
 }
 
 model Student {
@@ -209,9 +215,9 @@ model Student {
   active              Boolean
   CurrentClass        Class?             @relation(fields: [classId], references: [id])
   classId             Int?
-
-  sessions        Session[]
-  ClassAssignment ClassAssignment[]
+  endOfSessionAction  EndOfSessionEnum?  //CAN ONLY BE CHANGED BY THE END OF THIRD TERM
+  sessions            Session[]
+  ClassAssignment     ClassAssignment[]
 
   @@unique([firstName, lastName, motherMaidenName, phonenumber], name: "fullName")
 }
@@ -235,7 +241,6 @@ enum ClassLevel {
   SS1
   SS2
   SS3
- 
 }
 
 model SubjectAssigned {
@@ -270,13 +275,13 @@ model Class {
 }
 
 model CourseEnrollment {
-  id                String          @id @unique @default(uuid())
-  student           Student         @relation(fields: [studentId], references: [id])
-  studentId         Int
-  subject           SubjectAssigned @relation(fields: [subjectId], references: [id])
-  subjectId         String
-  session           Session         @relation(fields: [sessionId], references: [id])
-  sessionId         Int
+  id        String          @id @unique @default(uuid())
+  student   Student         @relation(fields: [studentId], references: [id])
+  studentId Int
+  subject   SubjectAssigned @relation(fields: [subjectId], references: [id])
+  subjectId String
+  session   Session         @relation(fields: [sessionId], references: [id])
+  sessionId Int
 
   admin             Admin           @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
   adminId           Int
@@ -305,14 +310,14 @@ model ClassAssignment {
 }
 
 model Grade {
-  id                 String           @id @default(uuid())
+  id                 String   @id @default(uuid())
   value              Float // You can adjust the data type as needed (e.g., Int for integer grades)
   tutorNote          String?
   // courseEnrollment   CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
   courseEnrollmentId String
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-  Term               Term?            @relation(fields: [termId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  Term               Term?    @relation(fields: [termId], references: [id])
   termId             Int?
 }
 
