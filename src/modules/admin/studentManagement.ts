@@ -54,6 +54,7 @@ export const studentClassAssignmentController = async (request: FastifyRequest<{
     try {
  ////from frontend only classes that belong to classToBeAssignedTo will be seen to assigned a class to them////
  ////have to verify the "action"///// so input doesn't violate it
+ ///then also for students that action has been carried out on them they will be grayed out, to prevent interaction
 
         const classAssigned = await studentClassAssignment({ ...request.body as StudentClassAssignmentInput, adminId: +request.user.id })
         if (classAssigned) {
