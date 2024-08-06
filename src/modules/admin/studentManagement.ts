@@ -121,7 +121,7 @@ const studentClassManagement = async (request: FastifyRequest<{
     //remove student from previous class and assign to new class
     //alter student tobeassigedclass field
 
-    response.status(200).send({ message: "success, new stdent class level is saved to database and action is saved", status: 200 })
+    response.status(200).send({ message: "success, student new  class level is saved to database and action is saved", status: 200 })
 
 
 

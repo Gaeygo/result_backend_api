@@ -182,16 +182,18 @@ model Session {
 }
 
 model Term {
-  id         Int      @id @default(autoincrement())
-  termName   String // E.g., "Term 1", "Term 2", "Term 3"
-  session    Session  @relation(fields: [sessionId], references: [id])
-  sessionId  Int
-  results    Grade[]
+  id        Int     @id @default(autoincrement())
+  termName  String // E.g., "Term 1", "Term 2", "Term 3"
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId Int
+
+  // Relation to TermResult
+  termResults TermResult[]
   // enrollments CourseEnrollment[]
-  openDate   DateTime
-  closedDate DateTime
-  inTerm     Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  openDate    DateTime
+  closedDate  DateTime
+  inTerm      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
 }
 
 enum EndOfSessionEnum {
@@ -215,7 +217,7 @@ model Student {
   active              Boolean
   CurrentClass        Class?             @relation(fields: [classId], references: [id])
   classId             Int?
-  endOfSessionAction  EndOfSessionEnum?  //CAN ONLY BE CHANGED BY THE END OF THIRD TERM
+  endOfSessionAction  EndOfSessionEnum? //CAN ONLY BE CHANGED BY THE END OF THIRD TERM
   sessions            Session[]
   ClassAssignment     ClassAssignment[]
 
@@ -283,6 +285,8 @@ model CourseEnrollment {
   session   Session         @relation(fields: [sessionId], references: [id])
   sessionId Int
 
+  termResults TermResult[]
+
   admin             Admin           @relation(fields: [adminId], references: [id]) // A subject can be created by one admin
   adminId           Int
   // class     Class           @relation(fields: [classId], references: [id])
@@ -309,16 +313,30 @@ model ClassAssignment {
   createdAt        DateTime           @default(now())
 }
 
-model Grade {
-  id                 String   @id @default(uuid())
-  value              Float // You can adjust the data type as needed (e.g., Int for integer grades)
-  tutorNote          String?
-  // courseEnrollment   CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
+// model Grade {
+//   id                 String   @id @default(uuid())
+//   value              Float // You can adjust the data type as needed (e.g., Int for integer grades)
+//   tutorNote          String?
+//   // courseEnrollment   CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
+//   courseEnrollmentId String
+//   createdAt          DateTime @default(now())
+//   updatedAt          DateTime @updatedAt
+//   // Term               Term?    @relation(fields: [termId], references: [id])
+//   // termId             Int?
+// }
+
+model TermResult {
+  id                 String           @id @default(uuid())
+  courseEnrollment   CourseEnrollment @relation(fields: [courseEnrollmentId], references: [id])
   courseEnrollmentId String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  Term               Term?    @relation(fields: [termId], references: [id])
-  termId             Int?
+  term               Term             @relation(fields: [termId], references: [id])
+  termId             Int
+  grade              Float
+  tutorNote          String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  //Add field for c.a, exam, et.al
+  @@unique([courseEnrollmentId, termId])
 }
 
 model Teacher {
@@ -337,6 +355,18 @@ model Teacher {
   password           String
 }
 
+//storage of constants
+//store keys in dotenv file
+model Constant {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  admin     Admin    @relation(fields: [adminId], references: [id])
+  adminId   Int
+}
+
 //registerable subjects
 
 //when you create a student, he is automatically registered for compulsory courses/subjects and can pick elective later if any
@@ -353,15 +383,3 @@ model Teacher {
 //   class    Class     @relation(fields: [classId], references: [id])
 //   classId  Int
 // }
-
-//storage of constants
-//store keys in dotenv file
-model Constant {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique
-  value     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  admin     Admin    @relation(fields: [adminId], references: [id])
-  adminId   Int
-}

@@ -4,7 +4,7 @@ import { buildJsonSchemas } from "fastify-zod"
 const addGrade = z.object({
     value: z.number(),
     tutorNote: z.string().optional(),
-    subjectId: z.string(),
+    subjectAssignedId: z.string(),
     // teacherId: z.number(),
     courseEnrollmentId: z.string(),
 })

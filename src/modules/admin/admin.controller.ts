@@ -7,6 +7,12 @@ import { generateDatePairs } from "../../utils/GenerateObjects";
 import HttpException from "../../schema/error";
 
 
+
+//check if a sessionor term is a constant in db
+//if there is the admin has to add them before being able to da anything
+//also teachers can't do anything
+//Just student checking their grades
+
 export const createAdmin = async (request: FastifyRequest<{
     Body: AdminCreateInput
 }>, response: FastifyReply) => {
@@ -68,7 +74,7 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         //a session can only be created when the previous session has elasped
-        const currentSession = await getCurrentSessionFromConstant(process.env.CURRENT_SESSION)
+        const currentSession = await getCurrentSessionFromConstant()
         if (currentSession && new Date(currentSession.closeDate).getTime() > Date.now()) throw new HttpException(400, "A New Session can only be creatd if previous Session has elasped")
 
 
@@ -110,7 +116,7 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
                 ]
             })
 
-            const addSessionConstant = await addSessionAsConstant(session.id, process.env.CURRENT_SESSION, +request.user.id)
+            const addSessionConstant = await addSessionAsConstant(session.id, +request.user.id)
 
             response.code(200).send({ message: ` ${session.academicYear} Session created` })
             //add a flag to make session current session
@@ -122,6 +128,8 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
     }
 
 }
+
+// export stateCurrentTerm 
 
 //addSessionAsConstant()
 
@@ -295,4 +303,3 @@ export const registerStudent = async (request: FastifyRequest<{
 
 
 
-//TODO: STUDENT CLASS REGISTRATION
