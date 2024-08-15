@@ -153,3 +153,5 @@ export const { schemas: adminSchema, $ref } = buildJsonSchemas({
     adminCreateSchema, adminSuspendSchema, teacherCreateSchema, studentClassAssignmentSchema, assignSubjectInputSchema, studentCreateSchema, createClassInput, loginSchema, createSubjectInputSchema
     , courseCumplsoryEnrollmentSchema, studentClassPlacementSchema
 }, { $id: 'Admin' })
+
+

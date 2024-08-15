@@ -34,14 +34,20 @@ export const viewHistoricGrades = async (request: FastifyRequest, response: Fast
 //add schema support for id
 //get current session and show grades
 export const viewCurrentGrades = async (request: FastifyRequest, response: FastifyReply) => {
+    const currentSession = await getCurrentSessionFromConstant()
     const result = await prisma.student.findUnique({
         where: {
-            id: +request.user.id
+            id: +request.user.id,
+
         },
         select: {
             courseEnrollments: {
+                where: {
+                    sessionId: currentSession?.id
+                },
                 select: {
                     termResults: true
+
                 },
             }
         }

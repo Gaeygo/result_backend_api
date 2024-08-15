@@ -150,6 +150,7 @@ export async function getCurrentSessionFromConstant() {
 
         return currentSession
     }
+   // else { return { success: false, message: 'Constant not added yet contact admin' } };
 
 }
 
@@ -165,7 +166,7 @@ export async function getSession(id: number) {
 }
 
 export const addSessionAsConstant = async (
-    newSessionId:  number,
+    newSessionId: number,
     adminId: number
 ) => {
     // Check if the new session exists
@@ -195,7 +196,7 @@ export const addSessionAsConstant = async (
         return currentSessionInit;
     } else {
         // Check if the current session's close date has elapsed
-        if (new Date(currentSession.closeDate).getTime() > Date.now()) {
+        if (new Date(currentSession?.closeDate).getTime() > Date.now()) {
             throw new HttpException(400, "Cannot change current session before its close date");
         }
 
@@ -218,88 +219,88 @@ export const addSessionAsConstant = async (
 
 
 interface TermData {
-  termId: number;
-  startDate: string;
-  endDate: string;
+    termId: number;
+    startDate: string;
+    endDate: string;
 }
 
 
 
 export async function setCurrentTerm(termData: TermData): Promise<{ success: boolean; message: string }> {
-  const { termId, startDate, endDate } = termData;
-  const now = new Date();
+    const { termId, startDate, endDate } = termData;
+    const now = new Date();
 
-  try {
-    // Check if the term exists
-    const term = await prisma.term.findUnique({ where: { id: termId } });
-    if (!term) {
-      return { success: false, message: 'Term not found' };
-    }
-
-    // Parse dates
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    // Validate dates
-    if (start >= end) {
-      return { success: false, message: 'Start date must be before end date' };
-    }
-
-    // Check if there's an existing current term
-    const currentTermConstant = await prisma.constant.findUnique({ where: { key: 'CURRENT_TERM' } });
-
-    if (currentTermConstant) {
-      const currentTerm = await prisma.term.findUnique({ where: { id: parseInt(currentTermConstant.value) } });
-      if (currentTerm) {
-        const currentEnd = new Date(currentTerm.closedDate);
-        
-        // If current term hasn't ended yet, don't allow change
-        if (now < currentEnd) {
-          return { success: false, message: 'Cannot change current term before it ends' };
+    try {
+        // Check if the term exists
+        const term = await prisma.term.findUnique({ where: { id: termId } });
+        if (!term) {
+            return { success: false, message: 'Term not found' };
         }
-      }
+
+        // Parse dates
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // Validate dates
+        if (start >= end) {
+            return { success: false, message: 'Start date must be before end date' };
+        }
+
+        // Check if there's an existing current term
+        const currentTermConstant = await prisma.constant.findUnique({ where: { key: 'CURRENT_TERM' } });
+
+        if (currentTermConstant) {
+            const currentTerm = await prisma.term.findUnique({ where: { id: parseInt(currentTermConstant.value) } });
+            if (currentTerm) {
+                const currentEnd = new Date(currentTerm.closedDate);
+
+                // If current term hasn't ended yet, don't allow change
+                if (now < currentEnd) {
+                    return { success: false, message: 'Cannot change current term before it ends' };
+                }
+            }
+        }
+
+        // If the new term has already started, don't allow change
+        if (now > start) {
+            return { success: false, message: 'Cannot set a term that has already started' };
+        }
+
+        // Update or create the CURRENT_TERM constant
+        await prisma.constant.upsert({
+            where: { key: 'CURRENT_TERM' },
+            update: { value: termId.toString() },
+            create: { key: 'CURRENT_TERM', value: termId.toString(), adminId: 1 } // Assuming admin ID 1 for simplicity
+        });
+
+        // Update the term dates
+        await prisma.term.update({
+            where: { id: termId },
+            data: { openDate: start, closedDate: end }
+        });
+
+        return { success: true, message: 'Current term updated successfully' };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Internal server error' };
     }
-
-    // If the new term has already started, don't allow change
-    if (now > start) {
-      return { success: false, message: 'Cannot set a term that has already started' };
-    }
-
-    // Update or create the CURRENT_TERM constant
-    await prisma.constant.upsert({
-      where: { key: 'CURRENT_TERM' },
-      update: { value: termId.toString() },
-      create: { key: 'CURRENT_TERM', value: termId.toString(), adminId: 1 } // Assuming admin ID 1 for simplicity
-    });
-
-    // Update the term dates
-    await prisma.term.update({
-      where: { id: termId },
-      data: { openDate: start, closedDate: end }
-    });
-
-    return { success: true, message: 'Current term updated successfully' };
-  } catch (error) {
-    console.error(error);
-    return { success: false, message: 'Internal server error' };
-  }
 }
 
 export async function getCurrentTerm(): Promise<{ success: boolean; term?: Term; message?: string }> {
-  try {
-    const currentTermConstant = await prisma.constant.findUnique({ where: { key: 'CURRENT_TERM' } });
-    if (!currentTermConstant) {
-      return { success: false, message: 'No current term set' };
-    }
+    try {
+        const currentTermConstant = await prisma.constant.findUnique({ where: { key: 'CURRENT_TERM' } });
+        if (!currentTermConstant) {
+            return { success: false, message: 'No current term set' };
+        }
 
-    const currentTerm = await prisma.term.findUnique({ where: { id: parseInt(currentTermConstant.value) } });
-    if (!currentTerm) {
-      return { success: false, message: 'Current term not found' };
-    }
+        const currentTerm = await prisma.term.findUnique({ where: { id: parseInt(currentTermConstant.value) } });
+        if (!currentTerm) {
+            return { success: false, message: 'Current term not found' };
+        }
 
-    return { success: true, term: currentTerm };
-  } catch (error) {
-    console.error(error);
-    return { success: false, message: 'Internal server error' };
-  }
+        return { success: true, term: currentTerm };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Internal server error' };
+    }
 }

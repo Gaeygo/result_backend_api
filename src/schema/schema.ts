@@ -10,3 +10,23 @@ export const CreateSessionSchema: FastifySchema = {
         required: ["academicYear"]
     }
 }
+
+
+// export type ErrorDetails = {
+//     field?: string;
+//     message: string;
+//   };
+  
+  export type ErrorResponse = {
+    message: string;
+    statusCode: number;
+    errorType: string;
+    errorCode: string;
+    // details?: ErrorDetails[];
+  };
+
+export type ApiResponse<T> = {
+    success: boolean;
+    data?: T;
+    error?: ErrorResponse;
+  };

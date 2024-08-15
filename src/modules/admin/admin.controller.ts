@@ -303,3 +303,5 @@ export const registerStudent = async (request: FastifyRequest<{
 
 
 
+////get grades for all
+////-based on students/class/teachers/subject

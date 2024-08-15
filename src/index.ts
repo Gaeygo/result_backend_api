@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { teacherSchema } from './modules/teacher/teacherSchema';
 import { authMiddleware } from './auth/authMiddleware';
 import { AuthRoute } from './auth/auth.route';
+import { StudentRoutes } from './modules/student/student.routes';
 
 
 // Initialize environment variables from .env file
@@ -62,6 +63,8 @@ async function main() {
 	server.register(AuthRoute, { prefix: "/api/auth" })
 	//Register admin routes
 	server.register(AdminRoutes, { prefix: "/api/admin" })
+
+	server.register(StudentRoutes, {prefix: "/api/students"})
 
 
 	server.listen({ port: 5000 }, function (err, address) {

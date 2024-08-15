@@ -14,7 +14,7 @@ export const addGrade = async (request: FastifyRequest<{
     const currentTerm = await getCurrentTerm()
     if (currentTerm.success === true && currentTerm.term) {
         ///1. look for student courseenrollment from subjectassigned to you
-        ///2. check for current term
+        ///2. check for current term 
         ///3. 
         // const grade = await prisma.grade.create({
         //     data: { ...request.body, teacherId: +request.user.id }
@@ -67,6 +67,25 @@ export const getSubjectsAssignedto = async (request: FastifyRequest, response: F
     })
 }
 
+//getSubjectAssignedto to see courseenrollments and students
+//when teacher clicks on a subject to add grades this details are given based on subjectAssigned id given
+export const getSubjectAssignedtoDetails = async (request: FastifyRequest<{
+    Body: {
+        subjectAssignedId: string
+    }
+}>, response: FastifyReply) => {
+    const subjectAssignedDetails = await prisma.subjectAssigned.findUnique({
+        where: {
+            id: request.body.subjectAssignedId,
+            teacherId: +request.user.id
+        }
+    })
+
+}
+
+
+
+//
 export const getGrades = async (request: FastifyRequest<{
     Body: { subjectId: string }
 }>, reply: FastifyReply) => {

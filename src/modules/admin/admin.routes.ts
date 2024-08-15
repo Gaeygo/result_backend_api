@@ -8,10 +8,11 @@ import { } from "../admin/studentManagement"
 export async function AdminRoutes(server: FastifyInstance) {
     server.post("/createAdmin", {
         schema: {
-            body: $ref("adminCreateSchema")
+            body: $ref("adminCreateSchema"),
+            //next time type the response
         },
-        preHandler: [authVerify<AdminCreateInput, {}>, authMiddleware<AdminCreateInput, {}>([ROLEENUM.SUPERADMIN])],
 
+        preHandler: [authVerify<AdminCreateInput, {}>, authMiddleware<AdminCreateInput, {}>([ROLEENUM.SUPERADMIN])],
     }, createAdmin)
 
     server.post("/suspendAdmin", {
