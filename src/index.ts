@@ -36,6 +36,8 @@ declare global {
 	}
 }
 
+//FIXME: ADD AN INTERCEPTOR THAT ADDS CURRENT SESSION AND TERM TO REQUEST 
+
 // server.decorate("auth", authMiddleware)
 
 // Declare a route  
@@ -47,6 +49,7 @@ server.get('/', function (request, reply) {
 
 //Register error middleware
 server.setErrorHandler(errorHandler)
+
 
 
 

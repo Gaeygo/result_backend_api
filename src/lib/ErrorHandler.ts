@@ -5,7 +5,7 @@ import logger from './logger';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ApiResponse } from '../schema/schema';
 
-
+//TODO: ADD LOGGING OF ERRORS TO FILE
 
 
 // checking if an object is of a certain type

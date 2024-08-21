@@ -179,6 +179,7 @@ model Session {
   adminId            Int
   ClassAssignment    ClassAssignment[]
   createdAt          DateTime           @default(now())
+  SubjectAssigned    SubjectAssigned[]
 }
 
 model Term {
@@ -258,6 +259,8 @@ model SubjectAssigned {
   isElective        Boolean            @default(false)
   subjectId         Int
   createdAt         DateTime           @default(now())
+  session           Session            @relation(fields: [sessionId], references: [id])
+  sessionId         Int
 }
 
 model Class {
@@ -335,8 +338,9 @@ model TermResult {
   tutorNote          String?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
+
   //Add field for c.a, exam, et.al
-  @@unique([courseEnrollmentId, termId])
+  @@unique([courseEnrollmentId, termId], name: "termResultUniqueId")
 }
 
 model Teacher {

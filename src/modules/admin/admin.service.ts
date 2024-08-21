@@ -131,6 +131,8 @@ export async function getCurrentClass(studentId: number) {
 
 }
 
+//TODO: ADD ERROR IF THE TERM/SESSION CHOSEN AS CURRENT, HAS A DATE THAT HAS ELAPSED
+
 /////GET CURRENT SESSION
 export async function getCurrentSessionFromConstant() {
     const sessionId = await prisma.constant.findUnique({
