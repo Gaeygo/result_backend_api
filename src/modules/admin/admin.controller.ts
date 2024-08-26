@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../../lib/prisma";
-import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, courseEnrollmentInput, CreateSubjectInput } from "./adminSchema";
+import { AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, courseEnrollmentInput, CreateSubjectInput, CreateSessionIput } from "./adminSchema";
 import { createClass, createStudent, AssignSubject, createTeacher, createSubject, studentClassAssignment, studentCourseEnrollment, getSession, getCurrentSessionFromConstant, addSessionAsConstant } from "./admin.service";
 import { hashPassword } from "../../auth/password";
 import { generateDatePairs } from "../../utils/GenerateObjects";
@@ -12,6 +12,8 @@ import HttpException from "../../schema/error";
 //if there is the admin has to add them before being able to da anything
 //also teachers can't do anything
 //Just student checking their grades
+//TODO: ALL functionalities will be limited if there's no term or session added as current
+
 
 export const createAdmin = async (request: FastifyRequest<{
     Body: AdminCreateInput
@@ -66,11 +68,7 @@ export const suspendAdmin = async (request: FastifyRequest<{ Body: AdminSuspendB
 
 //when a session is created 3 terms should automatically created
 export const createAndInitialiseSession = async (request: FastifyRequest<{
-    Body: {
-        academicYear: string,
-        startDate: Date,
-        closeDate: Date,
-    }
+    Body: CreateSessionIput
 }>, response: FastifyReply) => {
     try {
         //a session can only be created when the previous session has elasped
@@ -93,30 +91,30 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
             //
             const startingDate = new Date('2024-09-09');
 
-           //FIXME: make the terms input into a type 
-            const dates = generateDatePairs(startingDate, 3, 3, 3)
+            //FIXME: make the terms input into a type 
+            // const dates = generateDatePairs(startingDate, 3, 3, 3)
             const terms = await prisma.term.createMany({
                 data: [{
                     sessionId: session.id,
                     termName: "1st Term",
                     inTerm: true,
-                    openDate: dates[0][0],
-                    closedDate: dates[0][1]
+                    openDate: request.body.terms[0].openDate,
+                    closedDate: request.body.terms[0].closedDate
                 }, {
                     sessionId: session.id,
                     termName: "2nd Term",
-                    openDate: dates[1][0],
-                    closedDate: dates[1][1]
+                    openDate: request.body.terms[1].openDate,
+                    closedDate: request.body.terms[1].openDate
                 }, {
                     sessionId: session.id,
                     termName: "3rd Term",
-                    openDate: dates[2][0],
-                    closedDate: dates[2][1]
+                    openDate: request.body.terms[2].openDate,
+                    closedDate: request.body.terms[2].openDate
                 },
                 ]
             })
 
-            const addSessionConstant = await addSessionAsConstant(session.id, +request.user.id)
+            // const addSessionConstant = await addSessionAsConstant(session.id, +request.user.id)
 
             response.code(200).send({ message: ` ${session.academicYear} Session created` })
             //add a flag to make session current session

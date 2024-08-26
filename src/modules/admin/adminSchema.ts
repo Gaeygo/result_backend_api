@@ -5,7 +5,6 @@ import { ClassLevel } from "@prisma/client"
 
 
 
-
 const adminEnum = z.enum(["ADMIN", "SUPERADMIN"])
 export enum ROLEENUM {
     SUPERADMIN, ADMIN, TEACHER, STUDENT
@@ -78,7 +77,7 @@ const studentCreateSchema = z.object({
     phonenumber: z.string(),
     sessionId: z.number(),
     motherMaidenName: z.string(),
-    classToBeAssignedTo:  NGgradeEnum
+    classToBeAssignedTo: NGgradeEnum
 
 })
 
@@ -134,6 +133,25 @@ const loginSchema = z.object({
     userRole: roleZodEnum
 })
 
+const addTermSchema = z.object({
+    termName: z.string(),
+    openDate: z.date(),
+    closedDate: z.date(),
+    inTerm: z.boolean()
+})
+//options at frontend should just be 1st term, second term, third term
+
+
+const sessionCreateSchema = z.object({
+    academicYear: z.string(),
+    startDate: z.date(),
+    closeDate: z.date(),
+    //add option that dates are mutable by superadmins
+    terms: z.tuple([addTermSchema, addTermSchema, addTermSchema])
+
+})
+
+
 export type AdminCreateInput = z.infer<typeof adminCreateSchema>
 export type AdminSuspendBody = z.infer<typeof adminSuspendSchema>
 export type CreateTeacherInput = z.infer<typeof teacherCreateSchema>
@@ -144,14 +162,15 @@ export type CreateClassInput = z.infer<typeof createClassInput>
 export type courseEnrollmentInput = z.infer<typeof courseEnrollmentSchema>
 export type LoginBodyInput = z.infer<typeof loginSchema>
 export type StudentClassAssignmentInput = z.infer<typeof studentClassAssignmentSchema>
+export type CreateSessionIput = z.infer<typeof sessionCreateSchema>
 
 export type studentCompulsorySubjectAssignment = z.infer<typeof courseCumplsoryEnrollmentSchema>
 //Omit<courseEnrollmentInput, "subjectId">
-export type  StudentClassPlacementInput = z.infer<typeof studentClassPlacementSchema>
+export type StudentClassPlacementInput = z.infer<typeof studentClassPlacementSchema>
 
 export const { schemas: adminSchema, $ref } = buildJsonSchemas({
     adminCreateSchema, adminSuspendSchema, teacherCreateSchema, studentClassAssignmentSchema, assignSubjectInputSchema, studentCreateSchema, createClassInput, loginSchema, createSubjectInputSchema
-    , courseCumplsoryEnrollmentSchema, studentClassPlacementSchema
+    , courseCumplsoryEnrollmentSchema, studentClassPlacementSchema, sessionCreateSchema
 }, { $id: 'Admin' })
 
 

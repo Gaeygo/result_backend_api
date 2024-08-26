@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify"
 import { createAdmin, registerClass, registerStudent, registerAndAssignSubject, registerTeacher, suspendAdmin, addNewSubject, createAndInitialiseSession } from "./admin.controller"
-import { $ref, AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, ROLEENUM, CreateSubjectInput } from "./adminSchema"
+import { $ref, AdminCreateInput, AdminSuspendBody, CreateClassInput, CreateStudentInput, AssignSubjectInput, CreateTeacherInput, ROLEENUM, CreateSubjectInput, CreateSessionIput } from "./adminSchema"
 import { authVerify, authMiddleware } from "../../auth/authMiddleware"
 import { CreateSessionSchema } from "../../schema/schema"
 import { } from "../admin/studentManagement"
@@ -22,20 +22,13 @@ export async function AdminRoutes(server: FastifyInstance) {
         preHandler: [authVerify<AdminSuspendBody, {}>, authMiddleware<AdminSuspendBody, {}>([ROLEENUM.SUPERADMIN])],
     }, suspendAdmin)
 
+    //TODO:Refactor this mess
     server.post("/initialiseSession", {
         schema: {
-            body: CreateSessionSchema
+            body: $ref("sessionCreateSchema")
         },
 
-        preHandler: [authVerify<{
-            academicYear: string,
-            startDate: Date,
-            closeDate: Date
-        }, {}>, authMiddleware<{
-            academicYear: string,
-            startDate: Date,
-            closeDate: Date
-        }, {}>([ROLEENUM.SUPERADMIN])],
+        preHandler: [authVerify<CreateSessionIput, {}>, authMiddleware<CreateSessionIput, {}>([ROLEENUM.SUPERADMIN])],
 
     }, createAndInitialiseSession)
 

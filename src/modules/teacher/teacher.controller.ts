@@ -133,12 +133,28 @@ export const getSubjectAssignedtoDetails = async (request: FastifyRequest<{
         subjectAssignedId: string
     }
 }>, reply: FastifyReply) => {
-    const subjectAssignedDetails = await prisma.subjectAssigned.findUnique({
-        where: {
-            id: request.body.subjectAssignedId,
-            teacherId: +request.user.id
+    try {
+        const subjectAssignedDetails = await prisma.subjectAssigned.findUnique({
+            where: {
+                id: request.body.subjectAssignedId,
+                teacherId: +request.user.id
+            }
+        })
+
+        if (!subjectAssignedDetails) throw new HttpException(400, "Subject not found refer to admin")
+        
+        //TODO:   REFACTOR RESPONSE TYPES to exempt id and vulnerable data
+
+        const response: ApiResponse<SubjectAssigned> = {
+            success: true,
+            data: subjectAssignedDetails
         }
-    })
+        reply.code(200).send(response)
+
+    } catch (error) {
+        throw error
+    }
+
 
 }
 
@@ -157,7 +173,12 @@ export const getGrades = async (request: FastifyRequest<{
             courseEnrollments: {
                 select: {
                     //specify the term
-                    termResults: true
+                    termResults: {
+                        where: {
+                            //so if theres no term or session in body use currentterm and current session
+                            termId: +request.currentTermId
+                        }
+                    }
                 }
             }
         }

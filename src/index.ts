@@ -7,6 +7,9 @@ import { teacherSchema } from './modules/teacher/teacherSchema';
 import { authMiddleware } from './auth/authMiddleware';
 import { AuthRoute } from './auth/auth.route';
 import { StudentRoutes } from './modules/student/student.routes';
+import { requestExtensionPlugin } from "./plugin/ConstantInjectors"
+import fp from 'fastify-plugin'
+
 
 
 // Initialize environment variables from .env file
@@ -21,7 +24,9 @@ declare module 'fastify' {
 			id: string | number,
 			name: string,
 			role: ROLEENUM
-		}
+		},
+		currentTermId: number,
+		currentSessionId: number
 	}
 }
 
@@ -37,15 +42,19 @@ declare global {
 }
 
 //FIXME: ADD AN INTERCEPTOR THAT ADDS CURRENT SESSION AND TERM TO REQUEST 
+server.register(fp(requestExtensionPlugin))
 
 // server.decorate("auth", authMiddleware)
 
 // Declare a route  
 server.get('/', function (request, reply) {
 	reply.send({ hello: 'world' })
-
+	console.log(request.currentSessionId)
 
 })
+
+// server.decorateRequest("currentTermId", 1)
+
 
 //Register error middleware
 server.setErrorHandler(errorHandler)
@@ -67,7 +76,7 @@ async function main() {
 	//Register admin routes
 	server.register(AdminRoutes, { prefix: "/api/admin" })
 
-	server.register(StudentRoutes, {prefix: "/api/students"})
+	server.register(StudentRoutes, { prefix: "/api/students" })
 
 
 	server.listen({ port: 5000 }, function (err, address) {
