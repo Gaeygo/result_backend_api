@@ -58,3 +58,6 @@ export const viewCurrentGrades = async (request: FastifyRequest, response: Fasti
     }
     ///complete
 }
+
+
+//issue a ticket on grade  if you believe grade is bad

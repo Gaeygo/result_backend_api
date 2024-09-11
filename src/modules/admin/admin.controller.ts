@@ -5,6 +5,7 @@ import { createClass, createStudent, AssignSubject, createTeacher, createSubject
 import { hashPassword } from "../../auth/password";
 import { generateDatePairs } from "../../utils/GenerateObjects";
 import HttpException from "../../schema/error";
+import { generateNextId } from "../../utils/generateCustomIds";
 
 
 
@@ -228,6 +229,8 @@ export const createAndInitialiseSession = async (request: FastifyRequest<{
 //     //to disable or remove make initial session inactive and then remove
 // }
 
+//TODO: Set term as constant and function to change it
+
 //Send email for approval of creation || send details to phone number
 
 //creation of Teachers
@@ -287,6 +290,23 @@ export const registerStudent = async (request: FastifyRequest<{
 }>, response: FastifyReply) => {
     try {
         const student = await createStudent({ ...request.body, adminId: +request.user.id })
+        const { newId, newIdDetails } = await generateNextId({ adminId: +request.user.id, userId: student.id, type: "student", })
+        ///Use this to get student full details
+        const studentIdAssigned = await prisma.student.update({
+            where: {
+                id: student.id
+            },
+            data: {
+                IdGenerationStudentLog: {
+                    connect: {
+                        id: newIdDetails.id
+                    }
+                }
+            },
+            include: {
+                IdGenerationStudentLog: true
+            }
+        })
         if (student) {
             const studentAssignment = await studentClassAssignment({ studentId: student.id, classId: request.body.classId, sessionId: request.body.sessionId, adminId: +request.user.id })
 

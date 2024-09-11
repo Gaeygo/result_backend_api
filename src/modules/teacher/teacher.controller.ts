@@ -173,10 +173,12 @@ export const getGrades = async (request: FastifyRequest<{
             courseEnrollments: {
                 select: {
                     //specify the term
+                   
                     termResults: {
                         where: {
                             //so if theres no term or session in body use currentterm and current session
-                            termId: +request.currentTermId
+                            termId: +request.currentTermId,
+                            
                         }
                     }
                 }

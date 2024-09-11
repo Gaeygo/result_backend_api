@@ -204,23 +204,24 @@ enum EndOfSessionEnum {
 }
 
 model Student {
-  id                  Int                @id @unique @default(autoincrement())
-  firstName           String
-  lastName            String
-  middleName          String?
-  motherMaidenName    String
-  classToBeAssignedTo ClassLevel
-  phonenumber         String             @unique
-  password            String
-  courseEnrollments   CourseEnrollment[] // A student can register for multiple subjects
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
-  active              Boolean
-  CurrentClass        Class?             @relation(fields: [classId], references: [id])
-  classId             Int?
-  endOfSessionAction  EndOfSessionEnum? //CAN ONLY BE CHANGED BY THE END OF THIRD TERM
-  sessions            Session[]
-  ClassAssignment     ClassAssignment[]
+  id                     Int                     @id @unique @default(autoincrement())
+  firstName              String
+  lastName               String
+  middleName             String?
+  motherMaidenName       String
+  classToBeAssignedTo    ClassLevel
+  phonenumber            String                  @unique
+  password               String
+  courseEnrollments      CourseEnrollment[] // A student can register for multiple subjects
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  active                 Boolean
+  CurrentClass           Class?                  @relation(fields: [classId], references: [id])
+  classId                Int?
+  endOfSessionAction     EndOfSessionEnum? //CAN ONLY BE CHANGED BY THE END OF THIRD TERM
+  sessions               Session[]
+  ClassAssignment        ClassAssignment[]
+  IdGenerationStudentLog IdGenerationStudentLog?
 
   @@unique([firstName, lastName, motherMaidenName, phonenumber], name: "fullName")
 }
@@ -357,6 +358,23 @@ model Teacher {
   active             Boolean
   phonenumber        String            @unique
   password           String
+  // IdGenerationTeacherLog IdGenerationTeacherLog?
+}
+
+model IdGenerationStudentLog {
+  id          Int      @id @default(autoincrement())
+  student     Student  @relation(fields: [studentId], references: [id])
+  generatedId String
+  createdAt   DateTime @default(now())
+  studentId   Int      @unique
+}
+
+model IdGenerationTeacherLog {
+  id          Int      @id @default(autoincrement())
+  // teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  generatedId String
+  createdAt   DateTime @default(now())
+  // teacherId   Int      @unique
 }
 
 //storage of constants
